@@ -10,6 +10,8 @@ const Bid = () => {
 
     const [message, setMessage] = useState(0);
     const [max, setMax] = useState(0);
+    
+
     console.log(room);
     socket.emit('join_room', room);
 

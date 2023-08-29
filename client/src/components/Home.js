@@ -3,6 +3,7 @@ import { useState,useEffect } from 'react'
 import axios from 'axios'
 import { NavLink } from 'react-router-dom';
 import io from 'socket.io-client'
+
 const socket = io.connect('http://localhost:3001')
 let room = "";
 let setRoom = ""
@@ -51,7 +52,7 @@ const Home = () => {
       <NavLink to='/bid' >Bid</NavLink><br />
       <img src={url3} alt='beans' width='225px' onClick={() => handleClick(url3)} />
       <NavLink to='/bid' >Bid</NavLink><br /> */}
-
+    
       {
         data.length > 0 ? data.map((img, i) => {
           

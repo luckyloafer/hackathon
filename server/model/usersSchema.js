@@ -27,6 +27,10 @@ const userSchema = new mongoose.Schema({
     },
     date:{
         type:Date
+    },
+    email:{
+        type:String,
+        required:true
     }
 });
 

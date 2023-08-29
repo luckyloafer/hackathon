@@ -1,5 +1,7 @@
+require('dotenv').config();
 const express = require('express');
 const app = express();
+require('./db/conn');
 const router  = require('./routers/router');
 const http = require('http');
 const { Server } = require('socket.io');
@@ -8,6 +10,7 @@ const cors = require('cors');
 app.use(express.json());
 app.use(cors());
 app.use(router);
+app.use("/uploads", express.static("./uploads"));
 
 const server = http.createServer(app);
 
@@ -17,7 +20,9 @@ const io = new Server(server, {
         methods: ['GET', 'POST']
     }
 });
-//sample
+
+
+
 io.on("connection", (socket) => {
     console.log(socket.id);
 
@@ -41,7 +46,7 @@ io.on("connection", (socket) => {
         });
     });
 })
-
-server.listen(3001, () => {
+const PORT = process.env.PORT;
+server.listen(PORT, () => {
     console.log('server is running');
 })

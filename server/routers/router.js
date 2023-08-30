@@ -144,12 +144,12 @@ router.post("/otprequest", async (req, res) => {
 // sucess registration email
 
 router.post("/success", async (req, res) => {
-  const { email, fullName } = req.body;
+  const { email, fullname } = req.body;
   const mailOptions = {
     from: process.env.MAIL,
     to: email,
     subject: 'Successfully Registered for AUCTION',
-    text: `Dear ${fullName},
+    text: `Dear ${fullname},
   
       you succesfully registered
       `,

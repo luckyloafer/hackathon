@@ -43,7 +43,77 @@ const RegisterUser = () => {
     const handleProfile = (e) => {
         setProfile(e.target.files[0]);
     }
+    const handleOtpChange = (e)=>{
+        setOtp(e.target.value);
+    }
 
+    const handleOtp = async (e) => {
+        e.preventDefault();
+        if (!fullname || !email || !phNumber || !password || !profile || !city || !state) {
+          alert("Please enter all fields");
+          return;
+        }
+        setLoading(true);
+        try {
+          const response = await axios.post("http://localhost:3001/otprequest", {
+            email
+          });
+          console.log(response);
+          if (response.status===201) {
+            console.log(response.data.message.envelope);
+            alert("OTP sent to your email: "+response.data.message.envelope.to[0])
+            setOtpresponse(true);
+          } 
+          else {
+            console.log(response);
+            alert("Someone already has that email.Try another?");
+            setEmail("");
+          }
+          setLoading(false);
+        } catch (error) {
+          console.error('Error during OTP request:', error);
+          //setError(error.response.data.message);
+        }
+      };
+
+      const handleSubmit = async (e)=>{
+          e.preventDefault();
+          try {
+
+            var formData = new FormData();
+            formData.append('photo',profile);
+            formData.append('fullname',fullname);
+            formData.append('phNumber',phNumber);
+            formData.append('email',email);
+            formData.append('state',state);
+            formData.append('city',city);
+            formData.append('password',password);
+            formData.append('otp',otp);
+            const config = {
+                headers:{
+                    "Content-Type":"multipart/form-data"
+                }
+            }
+            const response = await axios.post("http://localhost:3001/register",formData,config)
+            
+            console.log("hi");
+            if(response.status===201){
+                try {
+                    await axios.post('http://localhost:3001/success',{email,fullname});
+                    alert('User Registered successfully');
+                    navigate('/');
+                } catch (error) {
+                    console.log('error sending success email',error);
+                }
+            }
+            else{
+                alert('Invalid otp:! try again');
+                setOtpresponse(false);
+            }
+          } catch (error) {
+              console.log(error);
+          }
+      }
 
     return (
         <>
@@ -53,36 +123,42 @@ const RegisterUser = () => {
                     type='text'
                     value={fullname}
                     onChange={handleFullname}
+                    name='fullname'
                 /><br/>
                 <label>PH NUMBER:</label>
                 <input
                     type='number'
                     value={phNumber}
                     onChange={handlePhNumber}
+                    name='phNumber'
                 /><br/>
                 <label>EMAIL:</label>
                 <input
                     type='email'
                     value={email}
                     onChange={handleEmail}
+                    name='email'
                 /><br/>
                 <label>STATE:</label>
                 <input
                     type='text'
                     value={state}
                     onChange={handleState}
+                    name='state'
                 /><br/>
                 <label>CITY:</label>
                 <input
                     type='text'
                     value={city}
                     onChange={handleCity}
+                    name='city'
                 /><br/>
                 <label>PASSWORD:</label>
                 <input
                     type='password'
                     value={password}
                     onChange={handlePassword}
+                    name='password'
                 /><br/>
                 <label>CONFIRM PASSWORD:</label>
                 <input
@@ -101,7 +177,7 @@ const RegisterUser = () => {
                     <div>
 
                             {loading ? (<CircularProgress color="success" />) :
-                            <button >
+                            <button onClick={handleOtp} >
                                 Request OTP
                             </button>}
                     </div> : (<div>
@@ -109,11 +185,12 @@ const RegisterUser = () => {
                         <input
                             type="text"
                             value={otp}
-                            //onChange={handleOtpChange}
+                            onChange={handleOtpChange}
                             required
+                            name='otp'
                         />
                         <div >
-                            <button  >
+                            <button  onClick={handleSubmit}>
                                 verify-otp
                             </button>
                         </div>

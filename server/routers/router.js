@@ -1,51 +1,170 @@
+require('dotenv').config();
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const moment = require('moment');
 const imgData = require('../data.json');
+const users = require('../model/usersSchema');
+const nodemailer = require('nodemailer');
+const NodeCache = require('node-cache');
+const crypto = require('crypto');
+const cache = new NodeCache();
+
+//nodemailer config
+
+const transporter = nodemailer.createTransport({
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true,
+  auth: {
+    user: process.env.MAIL,
+    pass: process.env.PASSWORD
+  },
+  tls: {
+    rejectUnauthorized: false,
+  },
+});
+
 
 //img storage
 
 const imgconfig = multer.diskStorage({
-    destination:(req, file, callback)=>{
-        callback(null, "./uploads")
-    },
-    filename:(req, file, callback)=>{
-        callback(null, `image-${Date.now()}.${file.originalname}`)
-    }
+  destination: (req, file, callback) => {
+    callback(null, "./uploads")
+  },
+  filename: (req, file, callback) => {
+    callback(null, `image-${Date.now()}.${file.originalname}`)
+  }
 })
 
 //img filter
 
-const isImage = (req,file,callback)=>{
-    if(file.mimetype.startsWith("image")){
-        callback(null,true);
-    }
-    else{
-        callback(new Error("only image is allowed"))
-    }
+const isImage = (req, file, callback) => {
+  if (file.mimetype.startsWith("image")) {
+    callback(null, true);
+  }
+  else {
+    callback(new Error("only image is allowed"))
+  }
 }
 
 const upload = multer({
-    storage:imgconfig,
-    fileFilter:isImage
+  storage: imgconfig,
+  fileFilter: isImage
 })
 
 
+//user register
+
+router.post('/register', upload.single("photo"), async (req, res) => {
+
+  const { filename } = req.file;
+  console.log(filename);
+  const { fullname, phNumber, email, state, city, password, otp } = req.body;
 
 
+  try {
 
+    const date = moment(new Date()).format("YYYY-MM-DD");
+    const storedOtp = cache.get(email);
 
-router.get('/imgData',async(req,res)=>{
+    if (storedOtp && storedOtp === otp) {
+      const userData = new users({
+        fullName: fullname,
+        phNumber: phNumber,
+        state: state,
+        city: city,
+        password: password,
+        imgpath: filename,
+        date: date,
+        email: email
+      });
 
-    try {
-        
-        res.status(201).json({status:201,imgData});
-
-    } catch (error) {
-        res.status(401).json({status:401 ,error})
+      const finaldata =  await userData.save();
+      res.status(201).json({ status: 201, finaldata });
     }
-    
+
+  } catch (error) {
+    res.status(500).json({ status: 500, error });
+  }
 })
+
+// sample images loading in home
+router.get('/imgData', async (req, res) => {
+
+  try {
+
+    res.status(201).json({ status: 201, imgData });
+
+  } catch (error) {
+    res.status(401).json({ status: 401, error })
+  }
+
+})
+
+
+/// otp verification
+
+router.post("/otprequest", async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const existingUser = await users.findOne({ email });
+    if (existingUser) {
+      console.log(existingUser);
+      return res.json({ message: 'User already exists' });
+    }
+
+    const otp = crypto.randomInt(100000, 999999);
+    cache.set(email, otp.toString());
+    console.log(otp);
+
+    const mailOptions = {
+      from: process.env.MAIL,
+      to: email,
+      subject: 'Email Confirmation OTP for AUCTION',
+      text: `Your OTP for email confirmation is: ${otp}`,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Error sending email:', error);
+        return res.status(500).json({ message: 'Internal server error' });
+      }
+
+      console.log('Email sent:', info);
+      return res.status(201).json({ message: info });
+    });
+  } catch (error) {
+    console.error('Error during OTP request:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// sucess registration email
+
+router.post("/success", async (req, res) => {
+  const { email, fullName } = req.body;
+  const mailOptions = {
+    from: process.env.MAIL,
+    to: email,
+    subject: 'Successfully Registered for AUCTION',
+    text: `Dear ${fullName},
+  
+      you succesfully registered
+      `,
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error('Error sending email:', error);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+
+    console.log('Email sent:', info);
+    return res.status(201).json({ message: 'Email sent successfully' });
+  });
+})
+
 
 module.exports = router;

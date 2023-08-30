@@ -93,9 +93,9 @@ const RegisterUser = () => {
                 <label>UPLOAD PROFILE:</label>
                 <input
                     type='file'
-                    value={profile}
                     onChange={handleProfile}
                     name='photo'
+                    //value={profile}
                 /><br/>
                 {!otpresponse ?
                     <div>

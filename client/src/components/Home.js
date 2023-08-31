@@ -3,6 +3,7 @@ import { useState,useEffect } from 'react'
 import axios from 'axios'
 import { NavLink } from 'react-router-dom';
 import io from 'socket.io-client'
+import Button from 'react-bootstrap/Button';
 
 const socket = io.connect('http://localhost:3001')
 let room = "";
@@ -59,7 +60,7 @@ const Home = () => {
           return (
             <>
               <img src={img.url} alt={img.name} width='225px' onClick={() => handleClick(img.url)} />
-              <NavLink to='/bid' >Bid</NavLink><br />
+              <NavLink to='/bid' ><Button variant='primary'>BID</Button></NavLink><br />
             </>
           )
         }) : ""

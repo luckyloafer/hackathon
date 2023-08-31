@@ -4,15 +4,25 @@ import axios from 'axios'
 import { NavLink } from 'react-router-dom';
 import io from 'socket.io-client'
 import Button from 'react-bootstrap/Button';
-
+import Image from 'react-bootstrap/Image';
+import jwt_decode from "jwt-decode";
+import Container from 'react-bootstrap/Container';
+import Nav from 'react-bootstrap/Nav';
+import Navbar from 'react-bootstrap/Navbar';
 const socket = io.connect('http://localhost:3001')
+
+//import { NavLink } from 'react-router-dom';
 let room = "";
 let setRoom = ""
-// const url1 = 'https://tse1.mm.bing.net/th?id=OIP.j14GSop07qOYX6Q9h04LhwHaF6&pid=Api&P=0&h=180'
-// const url2 = 'https://www.melaniecooks.com/wp-content/uploads/2014/07/cook-dried-beans-1024x768.jpg'
-// const url3 = 'https://tse1.mm.bing.net/th?id=OIP.IKB7G_jY59lK-4_VmUsDRQHaFF&pid=Api&P=0&h=180'
+
 const Home = () => {
 
+  const token = !!localStorage.getItem("token");
+  if (token) {
+    const Token = localStorage.getItem("token");
+    var decodedToken = jwt_decode(Token);
+    var username = decodedToken.name;
+  }
 
   [room, setRoom] = useState("https://tse1.mm.bing.net/th?id=OIP.j14GSop07qOYX6Q9h04LhwHaF6&pid=Api&P=0&h=180");
   const [data, setData] = useState([]);
@@ -47,20 +57,44 @@ const Home = () => {
   return (
     <div>
       
-      {/* <img src={url1} alt='tomato' onClick={() => handleClick(url1)} />
-      <NavLink to='/bid' >Bid</NavLink><br />
-      <img src={url2} alt='beans' width='225px' onClick={() => handleClick(url2)} />
-      <NavLink to='/bid' >Bid</NavLink><br />
-      <img src={url3} alt='beans' width='225px' onClick={() => handleClick(url3)} />
-      <NavLink to='/bid' >Bid</NavLink><br /> */}
+      <Navbar bg="dark" data-bs-theme="dark" style={{height:'60px'}}>
+        <Container>
+          <NavLink to="/" className="text-decoration-none text-light mx-2">Home</NavLink>
+          <Nav className="me-auto">
+          {token ? (
+                <NavLink to="/logout" className="text-decoration-none text-light mx-2">Logout</NavLink>
+              ) : (
+                <>
+                  <NavLink to="/login" className="text-decoration-none text-light mx-2">Login</NavLink>
+                  
+                    <NavLink to="/register" className="text-decoration-none text-light mx-2">SignUp</NavLink>
+                  
+                </>
+              )}
+            {/* <NavLink to="/register" className="text-decoration-none text-light mx-2">Register</NavLink>    
+            <NavLink to="/login" className="text-decoration-none text-light mx-2">Login</NavLink> */}
+          </Nav>
+        </Container>
+      </Navbar>
     
       {
         data.length > 0 ? data.map((img, i) => {
           
           return (
             <>
-              <img src={img.url} alt={img.name} width='225px' onClick={() => handleClick(img.url)} />
-              <NavLink to='/bid' ><Button variant='primary'>BID</Button></NavLink><br />
+            {
+              token?(
+              <> <Image src={img.url} alt={img.name} width='225px' onClick={() => handleClick(img.url)}  thumbnail />
+              <NavLink to='/bid' ><Button variant='dark'>BID</Button></NavLink><br />
+              </>):(
+
+                <> <Image src={img.url} alt={img.name} width='225px' onClick={() => handleClick(img.url)}  thumbnail />
+              <NavLink to='/login' ><Button variant='dark'>BID</Button></NavLink><br />
+              
+              </>
+              )
+            }
+              
             </>
           )
         }) : ""

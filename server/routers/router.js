@@ -9,6 +9,8 @@ const nodemailer = require('nodemailer');
 const NodeCache = require('node-cache');
 const crypto = require('crypto');
 const cache = new NodeCache();
+const jwt  = require('jsonwebtoken');
+const secret=process.env.SECRET;
 
 //nodemailer config
 
@@ -87,6 +89,23 @@ router.post('/register', upload.single("photo"), async (req, res) => {
   } catch (error) {
     res.status(500).json({ status: 500, error });
   }
+})
+
+router.post("/login",async (req,res)=>{
+  const {email,password}=req.body;
+ try{ 
+  const userfound = await users.findOne({email,password});
+  if(userfound){ 
+    const token = jwt.sign({ userId: userfound._id,name:userfound.fullName}, secret);
+   return res.status(201).json({ message: 'User login successfully' ,token});
+}
+return res.status(201).json({ message: 'User Not found' });
+}
+catch (error) {
+  console.error('Error during Login', error);
+  res.status(500).json({ message: 'Internal server error' });
+}
+
 })
 
 // sample images loading in home

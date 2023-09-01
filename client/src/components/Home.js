@@ -1,5 +1,5 @@
 import React from 'react'
-import { useState,useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { NavLink } from 'react-router-dom';
 import io from 'socket.io-client'
@@ -56,19 +56,25 @@ const Home = () => {
 
   return (
     <div>
-      
-      <Navbar bg="dark" data-bs-theme="dark" style={{height:'60px'}}>
+
+      <Navbar bg="dark" data-bs-theme="dark" style={{ height: '60px' }}>
         <Container>
           <NavLink to="/" className="text-decoration-none text-light mx-2">Home</NavLink>
           <Nav className="me-auto">
-          {token ? (
-                <NavLink to="/logout" className="text-decoration-none text-light mx-2">Logout</NavLink>
+            {token ?
+              (
+                <>
+                <h4 style={{color:'white'}}>Hi {username}</h4>
+                <NavLink to="/newItem" className="text-decoration-none text-light mx-2">NewItem</NavLink>
+                  <NavLink to="/logout" className="text-decoration-none text-light mx-2">Logout</NavLink>
+                </>
+
               ) : (
                 <>
                   <NavLink to="/login" className="text-decoration-none text-light mx-2">Login</NavLink>
-                  
-                    <NavLink to="/register" className="text-decoration-none text-light mx-2">SignUp</NavLink>
-                  
+
+                  <NavLink to="/register" className="text-decoration-none text-light mx-2">SignUp</NavLink>
+
                 </>
               )}
             {/* <NavLink to="/register" className="text-decoration-none text-light mx-2">Register</NavLink>    
@@ -76,25 +82,25 @@ const Home = () => {
           </Nav>
         </Container>
       </Navbar>
-    
+
       {
         data.length > 0 ? data.map((img, i) => {
-          
+
           return (
             <>
-            {
-              token?(
-              <> <Image src={img.url} alt={img.name} width='225px' onClick={() => handleClick(img.url)}  thumbnail />
-              <NavLink to='/bid' ><Button variant='dark'>BID</Button></NavLink><br />
-              </>):(
+              {
+                token ? (
+                  <> <Image src={img.url} alt={img.name} width='225px' onClick={() => handleClick(img.url)} thumbnail />
+                    <NavLink to='/bid' ><Button variant='dark'>BID</Button></NavLink><br />
+                  </>) : (
 
-                <> <Image src={img.url} alt={img.name} width='225px' onClick={() => handleClick(img.url)}  thumbnail />
-              <NavLink to='/login' ><Button variant='dark'>BID</Button></NavLink><br />
-              
-              </>
-              )
-            }
-              
+                  <> <Image src={img.url} alt={img.name} width='225px' onClick={() => handleClick(img.url)} thumbnail />
+                    <NavLink to='/login' ><Button variant='dark'>BID</Button></NavLink><br />
+
+                  </>
+                )
+              }
+
             </>
           )
         }) : ""

@@ -5,6 +5,7 @@ const multer = require('multer');
 const moment = require('moment');
 const imgData = require('../data.json');
 const users = require('../model/usersSchema');
+const items = require('../model/itemsSchema');
 const nodemailer = require('nodemailer');
 const NodeCache = require('node-cache');
 const crypto = require('crypto');
@@ -109,11 +110,12 @@ catch (error) {
 })
 
 // sample images loading in home
-router.get('/imgData', async (req, res) => {
+router.get('/itemsData', async (req, res) => {
 
   try {
 
-    res.status(201).json({ status: 201, imgData });
+    const getItem = await items.find();
+    res.status(201).json({ status: 201, getItem });
 
   } catch (error) {
     res.status(401).json({ status: 401, error })
@@ -184,6 +186,33 @@ router.post("/success", async (req, res) => {
     return res.status(201).json({ message: 'Email sent successfully' });
   });
 })
+
+router.post("/newItem", upload.single("photo"),async(req,res)=>{
+  const { filename } = req.file;
+  console.log(filename);
+  const { itemName, price, state, city } = req.body;
+
+  try {
+    const date = moment(new Date()).format("YYYY-MM-DD");
+    const itemData = new items({
+      itemName: itemName,
+      price: price,
+      state: state,
+      city: city,
+      imgpath: filename,
+      date: date
+    });
+
+    const finaldata =  await itemData.save();
+    res.status(201).json({ status: 201, finaldata });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ status: 500, error });
+  }
+})
+
+
 
 
 module.exports = router;

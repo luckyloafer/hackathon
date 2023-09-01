@@ -32,8 +32,8 @@ const Home = () => {
     setRoom(url + "kkkkkkkkkkkkkkkkkk");
   }
 
-  const getImgData = async () => {
-    const res = await axios.get("http://localhost:3001/imgData", {
+  const getItemsData = async () => {
+    const res = await axios.get("http://localhost:3001/itemsData", {
       headers: {
         "Content-Type": "application/json"
       }
@@ -43,14 +43,14 @@ const Home = () => {
       console.log("error");
     }
     else {
-      setData(res.data.imgData);
+      setData(res.data.getItem);
     }
   }
 
 
   useEffect(() => {
     console.log('rendered')
-    getImgData();
+    getItemsData();
   }, [])
 
 
@@ -64,8 +64,8 @@ const Home = () => {
             {token ?
               (
                 <>
-                <h4 style={{color:'white'}}>Hi {username}</h4>
-                <NavLink to="/newItem" className="text-decoration-none text-light mx-2">NewItem</NavLink>
+                  <h4 style={{ color: 'white' }}>Hi {username}</h4>
+                  <NavLink to="/newItem" className="text-decoration-none text-light mx-2">NewItem</NavLink>
                   <NavLink to="/logout" className="text-decoration-none text-light mx-2">Logout</NavLink>
                 </>
 
@@ -88,17 +88,14 @@ const Home = () => {
 
           return (
             <>
+              <Image src={`http://localhost:3001/uploads/${img.imgpath}`} alt={img.name} width='225px' height='225px' onClick={() => handleClick(img.url)} thumbnail />
               {
-                token ? (
-                  <> <Image src={img.url} alt={img.name} width='225px' onClick={() => handleClick(img.url)} thumbnail />
+                token ?
+                  <>
                     <NavLink to='/bid' ><Button variant='dark'>BID</Button></NavLink><br />
-                  </>) : (
-
-                  <> <Image src={img.url} alt={img.name} width='225px' onClick={() => handleClick(img.url)} thumbnail />
-                    <NavLink to='/login' ><Button variant='dark'>BID</Button></NavLink><br />
-
                   </>
-                )
+                  : <><NavLink to='/login' ><Button variant='dark'>BID</Button></NavLink><br /></>
+
               }
 
             </>

@@ -59,7 +59,7 @@ const Home = () => {
 
   useEffect(() => {
     console.log('rendered')
-    getItemsData('telangana');
+    getItemsData('all');
   }, [])
 
 
@@ -71,6 +71,7 @@ const Home = () => {
 
         <input placeholder="Search for a movie" value={searchTerm} onChange={(event)=>setSearchTerm(event.target.value)}/>
           <button onClick={()=>getItemsData(searchTerm)}>search</button>
+          <button onClick={()=>getItemsData('all')}>Reset</button>
           <NavLink to="/" className="text-decoration-none text-light mx-2">Home</NavLink>
           <Nav className="me-auto">
             {token ?

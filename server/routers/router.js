@@ -113,9 +113,32 @@ catch (error) {
 router.get('/itemsData/:state', async (req, res) => {
 
   try {
+    console.log(req.params.userId);
+    if(req.params.state==='all'){
+      const getItem = await items.find();
+      res.status(201).json({status:201,getItem});
+    }
+    else{
+      const getItem = await items.find({state:req.params.state});
+      res.status(201).json({ status: 201, getItem });
+    }
+    
 
-    const getItem = await items.find({state:req.params.state});
-    res.status(201).json({ status: 201, getItem });
+  } catch (error) {
+    res.status(401).json({ status: 401, error })
+  }
+
+})
+
+//userItems Data
+
+router.get('/userItemsData/:userId', async (req, res) => {
+
+  try {
+
+    
+      const getItem = await items.find({userName:req.params.userId});
+      res.status(201).json({status:201,getItem});
 
   } catch (error) {
     res.status(401).json({ status: 401, error })

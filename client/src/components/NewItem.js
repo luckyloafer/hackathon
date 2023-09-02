@@ -13,7 +13,7 @@ const NewItem = () => {
     if (token) {
         const Token = localStorage.getItem("token");
         var decodedToken = jwt_decode(Token);
-        var username = decodedToken.name;
+        var username = decodedToken.userId;
     }
 
     const [itemImage, setItemImage] = useState("");
@@ -47,7 +47,8 @@ const handleSubmit = async (e)=>{
             formData.append('itemName', itemName);
             formData.append('price', price);        
             formData.append('state', state);
-            formData.append('city', city);   
+            formData.append('city', city);  
+            formData.append('userName', username) ;
             const config = {
                 headers: {
                     "Content-Type": "multipart/form-data"

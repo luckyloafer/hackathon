@@ -110,11 +110,11 @@ catch (error) {
 })
 
 // sample images loading in home
-router.get('/itemsData', async (req, res) => {
+router.get('/itemsData/:state', async (req, res) => {
 
   try {
 
-    const getItem = await items.find();
+    const getItem = await items.find({state:req.params.state});
     res.status(201).json({ status: 201, getItem });
 
   } catch (error) {
@@ -190,12 +190,13 @@ router.post("/success", async (req, res) => {
 router.post("/newItem", upload.single("photo"),async(req,res)=>{
   const { filename } = req.file;
   console.log(filename);
-  const { itemName, price, state, city } = req.body;
+  const { itemName,userName,price, state, city } = req.body;
 
   try {
     const date = moment(new Date()).format("YYYY-MM-DD");
     const itemData = new items({
       itemName: itemName,
+      userName:userName,
       price: price,
       state: state,
       city: city,

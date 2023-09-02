@@ -1,7 +1,7 @@
 import React from 'react'
 import { useState, useEffect } from 'react'
 import axios from 'axios'
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import io from 'socket.io-client'
 import Button from 'react-bootstrap/Button';
 import Image from 'react-bootstrap/Image';
@@ -16,6 +16,8 @@ let room = "";
 let setRoom = ""
 
 const Home = () => {
+  
+  const navigate= useNavigate();
 
   const token = !!localStorage.getItem("token");
   if (token) {
@@ -26,14 +28,19 @@ const Home = () => {
 
   [room, setRoom] = useState("https://tse1.mm.bing.net/th?id=OIP.j14GSop07qOYX6Q9h04LhwHaF6&pid=Api&P=0&h=180");
   const [data, setData] = useState([]);
+  const [searchTerm,setSearchTerm]= useState("");
 
 
   const handleClick = (url) => {
     setRoom(url + "kkkkkkkkkkkkkkkkkk");
   }
 
-  const getItemsData = async () => {
-    const res = await axios.get("http://localhost:3001/itemsData", {
+ 
+ 
+  
+
+  const getItemsData = async (state) => {
+    const res = await axios.get(`http://localhost:3001/itemsData/${state}`, {
       headers: {
         "Content-Type": "application/json"
       }
@@ -43,14 +50,16 @@ const Home = () => {
       console.log("error");
     }
     else {
+      console.log(res.data.getItem)
       setData(res.data.getItem);
+      
     }
   }
 
 
   useEffect(() => {
     console.log('rendered')
-    getItemsData();
+    getItemsData('telangana');
   }, [])
 
 
@@ -59,6 +68,9 @@ const Home = () => {
 
       <Navbar bg="dark" data-bs-theme="dark" style={{ height: '60px' }}>
         <Container>
+
+        <input placeholder="Search for a movie" value={searchTerm} onChange={(event)=>setSearchTerm(event.target.value)}/>
+          <button onClick={()=>getItemsData(searchTerm)}>search</button>
           <NavLink to="/" className="text-decoration-none text-light mx-2">Home</NavLink>
           <Nav className="me-auto">
             {token ?
@@ -84,11 +96,14 @@ const Home = () => {
       </Navbar>
 
       {
+        
         data.length > 0 ? data.map((img, i) => {
 
           return (
             <>
-              <Image src={`http://localhost:3001/uploads/${img.imgpath}`} alt={img.name} width='225px' height='225px' onClick={() => handleClick(img.url)} thumbnail />
+              
+              <><Image src={`http://localhost:3001/uploads/${img.imgpath}`} alt={img.name} width='225px' height='225px' onClick={() => handleClick(img.url)} thumbnail />
+              <h2>{img.itemName}</h2>
               {
                 token ?
                   <>
@@ -97,6 +112,10 @@ const Home = () => {
                   : <><NavLink to='/login' ><Button variant='dark'>BID</Button></NavLink><br /></>
 
               }
+              </>
+              
+              
+              
 
             </>
           )

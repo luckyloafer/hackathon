@@ -97,7 +97,7 @@ router.post("/login",async (req,res)=>{
  try{ 
   const userfound = await users.findOne({email,password});
   if(userfound){ 
-    const token = jwt.sign({ userId: userfound._id,name:userfound.fullName}, secret);
+    const token = jwt.sign({ userId: userfound._id,name:userfound.fullName,email:userfound.email}, secret);
    return res.status(201).json({ message: 'User login successfully' ,token});
 }
 return res.status(201).json({ message: 'User Not found' });
@@ -144,6 +144,21 @@ router.get('/userItemsData/:userId', async (req, res) => {
     res.status(401).json({ status: 401, error })
   }
 
+})
+
+//item delete
+
+router.delete('/dltItem/:id', async(req,res)=>{
+
+  try {
+
+    const {id} = req.params;
+    const dltItem = await items.findByIdAndDelete({_id:id});
+    res.status(201).json({status:201,dltItem});
+    
+  } catch (error) {
+     res.status(401).json({status:401,error})
+  }
 })
 
 
@@ -236,7 +251,43 @@ router.post("/newItem", upload.single("photo"),async(req,res)=>{
   }
 })
 
+//dlt Otp request
 
+router.post("/dltOtprequest", async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    // const existingUser = await users.findOne({ email });
+    // if (existingUser) {
+    //   console.log(existingUser);
+    //   return res.json({ message: 'User already exists' });
+    // }
+
+    const otp = crypto.randomInt(100000, 999999);
+    cache.set(email, otp.toString());
+    console.log(otp);
+
+    const mailOptions = {
+      from: process.env.MAIL,
+      to: email,
+      subject: 'Email Confirmation OTP for Item Deletion',
+      text: `Your OTP for Item deletion confirmation is: ${otp}`,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Error sending email:', error);
+        return res.status(500).json({ message: 'Internal server error' });
+      }
+
+      console.log('Email sent:', info);
+      return res.status(201).json({ message: info });
+    });
+  } catch (error) {
+    console.error('Error during OTP request:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
 
 
 module.exports = router;

@@ -4,11 +4,11 @@ import axios from 'axios'
 import { NavLink, useNavigate } from 'react-router-dom';
 import io from 'socket.io-client'
 import Button from 'react-bootstrap/Button';
-import Image from 'react-bootstrap/Image';
 import jwt_decode from "jwt-decode";
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
+import Card from 'react-bootstrap/Card';
 const socket = io.connect('http://localhost:3001')
 
 //import { NavLink } from 'react-router-dom';
@@ -16,8 +16,8 @@ let room = "";
 let setRoom = ""
 
 const Home = () => {
-  
-  const navigate= useNavigate();
+
+  const navigate = useNavigate();
 
   const token = !!localStorage.getItem("token");
   if (token) {
@@ -28,18 +28,19 @@ const Home = () => {
 
   [room, setRoom] = useState("https://tse1.mm.bing.net/th?id=OIP.j14GSop07qOYX6Q9h04LhwHaF6&pid=Api&P=0&h=180");
   const [data, setData] = useState([]);
-  const [searchTerm,setSearchTerm]= useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 
 
   const handleClick = (url) => {
     setRoom(url + "kkkkkkkkkkkkkkkkkk");
   }
 
- 
- 
-  
+
+
+
 
   const getItemsData = async (state) => {
+
     const res = await axios.get(`http://localhost:3001/itemsData/${state}`, {
       headers: {
         "Content-Type": "application/json"
@@ -50,9 +51,9 @@ const Home = () => {
       console.log("error");
     }
     else {
-      console.log(res.data.getItem)
+      //console.log(res.data.getItem)
       setData(res.data.getItem);
-      
+
     }
   }
 
@@ -69,9 +70,9 @@ const Home = () => {
       <Navbar bg="dark" data-bs-theme="dark" style={{ height: '60px' }}>
         <Container>
 
-        <input placeholder="Search for a movie" value={searchTerm} onChange={(event)=>setSearchTerm(event.target.value)}/>
-          <button onClick={()=>getItemsData(searchTerm)}>search</button>
-          <button onClick={()=>getItemsData('all')}>Reset</button>
+          <input placeholder="Search for a movie" value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} />
+          {searchTerm.length===0 ? <button>search</button>:<button onClick={() => getItemsData(searchTerm)}>search</button>}
+          <button onClick={() => getItemsData('all')}>Reset</button>
           <NavLink to="/" className="text-decoration-none text-light mx-2">Home</NavLink>
           <Nav className="me-auto">
             {token ?
@@ -97,26 +98,46 @@ const Home = () => {
       </Navbar>
 
       {
-        
+
         data.length > 0 ? data.map((img, i) => {
 
           return (
             <>
-              
-              <><Image src={`http://localhost:3001/uploads/${img.imgpath}`} alt={img.name} width='225px' height='225px' onClick={() => handleClick(img.url)} thumbnail />
-              <h2>{img.itemName}</h2>
-              {
-                token ?
-                  <>
-                    <NavLink to='/bid' ><Button variant='dark'>BID</Button></NavLink><br />
-                  </>
-                  : <><NavLink to='/login' ><Button variant='dark'>BID</Button></NavLink><br /></>
 
-              }
+              {/* <><Image src={`http://localhost:3001/uploads/${img.imgpath}`} alt={img.name} width='225px' height='225px' onClick={() => handleClick(img.url)} thumbnail />
+                <h2>{img.itemName}</h2>
+                {
+                  token ?
+                    <>
+                      <NavLink to='/bid' ><Button variant='dark'>BID</Button></NavLink><br />
+                    </>
+                    : <><NavLink to='/login' ><Button variant='dark'>BID</Button></NavLink><br /></>
+
+                }
+              </> */}
+              <>
+                <Card style={{ width: '18rem' }}>
+                  <Card.Img variant="top" src={`http://localhost:3001/uploads/${img.imgpath}`} style={{ width: '200px', height: '200px' }} />
+                  <Card.Body>
+                    <Card.Title>{img.itemName}</Card.Title>
+                    <Card.Text>
+                      Base Price : {img.price}$
+
+                    </Card.Text>
+                    {
+                      token ?
+                        <>
+                          <NavLink to='/bid' ><Button variant='dark'>BID</Button></NavLink><br />
+                        </>
+                        : <><NavLink to='/login' ><Button variant='dark'>BID</Button></NavLink><br /></>
+
+                    }
+                  </Card.Body>
+                </Card>
               </>
-              
-              
-              
+
+
+
 
             </>
           )

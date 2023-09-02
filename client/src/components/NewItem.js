@@ -5,8 +5,12 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import { NavLink, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import Image from 'react-bootstrap/Image';
+import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
+import { CircularProgress } from "@mui/material";
+import Alert from 'react-bootstrap/Alert';
+
+
 const NewItem = () => {
     const navigate = useNavigate();
 
@@ -15,7 +19,8 @@ const NewItem = () => {
         const Token = localStorage.getItem("token");
         var decodedToken = jwt_decode(Token);
         var userId = decodedToken.userId;
-        var username = decodedToken.name
+        var username = decodedToken.name;
+        var email = decodedToken.email;
     }
     const [data, setData] = useState([]);
     const [itemImage, setItemImage] = useState("");
@@ -23,6 +28,10 @@ const NewItem = () => {
     const [price, setPrice] = useState(0);
     const [state, setState] = useState("");
     const [city, setCity] = useState("");
+    const [otp, setOtp] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [otpresponse, setOtpresponse] = useState(false);
+    const [show, setShow] = useState(false);
 
     const handleItemImage = (e) => {
         setItemImage(e.target.files[0]);
@@ -38,6 +47,9 @@ const NewItem = () => {
     }
     const handleCity = (e) => {
         setCity(e.target.value);
+    }
+    const handleOtpChange = (e) => {
+        setOtp(e.target.value);
     }
 
     const handleSubmit = async (e) => {
@@ -91,6 +103,48 @@ const NewItem = () => {
         }
     }
 
+    const handleOtp = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        try {
+
+            const response = await axios.post("http://localhost:3001/dltOtprequest", {
+                email
+            });
+            if (response.status === 201) {
+                console.log(response.data.message.envelope);
+                alert("OTP for deletion sent to your email: " + response.data.message.envelope.to[0])
+                setOtpresponse(true);
+            }
+            else {
+                console.log(response);
+                alert("Someone already has that email.Try another?");
+                //setEmail("");
+            }
+            setLoading(false);
+
+        } catch (error) {
+            console.log("error during Otp", error);
+        }
+    }
+
+    const dltItem = async (id) => {
+        const res = await axios.delete(`http://localhost:3001/dltItem/${id}`, {
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+
+        if (res.data.status === 401 || !res.data) {
+            console.log("error");
+        }
+        else {
+            console.log("item delete");
+            setData(prevData => prevData.filter(item => item._id !== id));
+            setShow(true);
+        }
+    }
+
     useEffect(() => {
         getUserItems(userId);
     }, [])
@@ -124,6 +178,13 @@ const NewItem = () => {
                 </Container>
             </Navbar>
 
+            {
+                
+                show ? <Alert variant="danger" onClose={() => setShow(false)} dismissible>
+                        Item Deleted
+                        </Alert> : ""
+
+       }
             <form onSubmit={handleSubmit}>
                 <label>Item NAME:</label>
                 <input
@@ -175,12 +236,36 @@ const NewItem = () => {
                         <>
                             {/* <Image src={`http://localhost:3001/uploads/${img.imgpath}`} alt={img.name} width='225px' height='225px' thumbnail /> */}
                             <Card style={{ width: '18rem' }}>
-                                <Card.Img variant="top" src={`http://localhost:3001/uploads/${img.imgpath}`} width='60px'/>
+                                <Card.Img variant="top" src={`http://localhost:3001/uploads/${img.imgpath}`} style={{ width: '200px', height: '200px' }} />
                                 <Card.Body>
                                     <Card.Title>{img.itemName}</Card.Title>
                                     <Card.Text>
                                         Base Price : {img.price}$
+
                                     </Card.Text>
+                                    {/* <button onClick={()=>{dltItem(img._id)}}>Delete Item</button> */}
+                                    {!otpresponse ?
+                                        <div>
+
+                                            {loading ? (<CircularProgress color="success" />) :
+                                                <Button variant="dark" onClick={handleOtp} >
+                                                    OTP-Deletion
+                                                </Button>}
+                                        </div> : (<div>
+                                            <label>OTP:</label>
+                                            <input
+                                                type="text"
+                                                value={otp}
+                                                onChange={handleOtpChange}
+                                                required
+                                                name='otp'
+                                            />
+                                            <div >
+                                                <button onClick={() => { dltItem(img._id) }}>
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        </div>)}
                                 </Card.Body>
                             </Card>
 

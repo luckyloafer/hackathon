@@ -28,6 +28,10 @@ const itemsSchema = new mongoose.Schema({
     date:{
         type:Date
     },
+    sold:{
+        type:String,
+        required:true
+    }
 });
 
 const items = new mongoose.model("items",itemsSchema);

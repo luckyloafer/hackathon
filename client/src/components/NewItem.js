@@ -179,12 +179,12 @@ const NewItem = () => {
             </Navbar>
 
             {
-                
-                show ? <Alert variant="danger" onClose={() => setShow(false)} dismissible>
-                        Item Deleted
-                        </Alert> : ""
 
-       }
+                show ? <Alert variant="danger" onClose={() => setShow(false)} dismissible>
+                    Item Deleted
+                </Alert> : ""
+
+            }
             <form onSubmit={handleSubmit}>
                 <label>Item NAME:</label>
                 <input
@@ -248,29 +248,37 @@ const NewItem = () => {
                                         <div>
 
                                             {loading ? (<CircularProgress color="success" />) :
-                                                <Button variant="dark" onClick={handleOtp} >
-                                                    OTP-Deletion
-                                                </Button>}
-                                        </div> : (<div>
-                                            <label>OTP:</label>
-                                            <input
-                                                type="text"
-                                                value={otp}
-                                                onChange={handleOtpChange}
-                                                required
-                                                name='otp'
-                                            />
-                                            <div >
-                                                <button onClick={() => { dltItem(img._id) }}>
-                                                    Delete
-                                                </button>
-                                            </div>
-                                        </div>)}
-                                </Card.Body>
-                            </Card>
+                                               <> {
+                                                    img.sold === "no" ? <Button variant="dark" onClick={handleOtp} >
+                                                        OTP-Deletion
+                                                    </Button> : <Button variant="danger">
+                                                        SOLD
+                                                    </Button>}
+                                                    </>
+                                            }     
+                                                {/* < Button variant="dark" onClick={handleOtp} >
+                                            OTP-Deletion
+                                        </Button>} */}
+                                </div> : (<div>
+                                    <label>OTP:</label>
+                                    <input
+                                        type="text"
+                                        value={otp}
+                                        onChange={handleOtpChange}
+                                        required
+                                        name='otp'
+                                    />
+                                    <div >
+                                        <button onClick={() => { dltItem(img._id) }}>
+                                            Delete
+                                        </button>
+                                    </div>
+                                </div>)}
+                            </Card.Body>
+                        </Card >
 
                         </>)
-                }) : ""
+}) : ""
             }
         </>
     )

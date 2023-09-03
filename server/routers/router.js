@@ -239,7 +239,8 @@ router.post("/newItem", upload.single("photo"),async(req,res)=>{
       state: state,
       city: city,
       imgpath: filename,
-      date: date
+      date: date,
+      sold:"no"
     });
 
     const finaldata =  await itemData.save();

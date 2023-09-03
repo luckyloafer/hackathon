@@ -31,8 +31,11 @@ const Home = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
 
-  const handleClick = (url) => {
-    setRoom(url + "kkkkkkkkkkkkkkkkkk");
+  const handleClick = async(url) => {
+    await setRoom(url + "kkkkkkkkkkkkkkkkkk");
+    console.log(room);
+    navigate('/bid');
+    
   }
 
 
@@ -116,8 +119,8 @@ const Home = () => {
                 }
               </> */}
               <>
-                <Card style={{ width: '18rem' }}>
-                  <Card.Img variant="top" src={`http://localhost:3001/uploads/${img.imgpath}`} style={{ width: '200px', height: '200px' }} />
+                {img.sold==="no" ?<Card style={{ width: '18rem' }}>
+                  <Card.Img variant="top" src={`http://localhost:3001/uploads/${img.imgpath}`} style={{ width: '200px', height: '200px' }}  />
                   <Card.Body>
                     <Card.Title>{img.itemName}</Card.Title>
                     <Card.Text>
@@ -127,13 +130,14 @@ const Home = () => {
                     {
                       token ?
                         <>
-                          <NavLink to='/bid' ><Button variant='dark'>BID</Button></NavLink><br />
+                          <Button variant='dark' onClick={() => handleClick(img.imgpath)}>BID</Button>
+                          {/* <NavLink  to='/bid'  ><Button variant='dark' >BID</Button></NavLink><br /> */}
                         </>
                         : <><NavLink to='/login' ><Button variant='dark'>BID</Button></NavLink><br /></>
 
                     }
                   </Card.Body>
-                </Card>
+                </Card> : null}
               </>
 
 

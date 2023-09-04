@@ -197,7 +197,7 @@ const NewItem = () => {
                             (
                                 <>
                                     <h4 style={{ color: 'white' }}>Hi {username}</h4>
-                                    <NavLink to="/newItem" className="text-decoration-none text-light mx-2">Dashboard</NavLink>
+                                    <NavLink to="/newItem" className="text-decoration-none text-light mx-2">Dashboard </NavLink>
                                     <NavLink to="/logout" className="text-decoration-none text-light mx-2">Logout</NavLink>
                                 </>
 

@@ -24,17 +24,23 @@ const io = new Server(server, {
 
 
 io.on("connection", (socket) => {
-    console.log(socket.id);
+    //console.log(socket.id);
 
     socket.on('join_room', (data) => {
-        console.log(data)
+        console.log("join_room - ", data)
         socket.join(data);
         
     })
 
     socket.on('send_message', (data) => {
-        console.log(data)
+        console.log( "send_message - ",data.room)
         socket.to(data.room).emit('received_message', data);
+    })
+
+    socket.on('auctionStarted',(data)=>{
+        console.log("auctionStarted - ",data);
+        const to = data;
+        socket.to(data).emit(to,data);
     })
     socket.on('disconnecting', () => {
         const rooms = Object.keys(socket.rooms);

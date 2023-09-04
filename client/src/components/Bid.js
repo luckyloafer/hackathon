@@ -21,10 +21,10 @@ const Bid = () => {
     const [message, setMessage] = useState(0);
     const [max, setMax] = useState(0);
     const [maxBidder, setMaxBidder] = useState("");
-
-    console.log(room);
-    socket.emit('join_room', room);
-
+    const [auctionSignal,setAuctionSignal] = useState(false);
+    const [roomName,setRoomName] = useState("");
+    //console.log(room);
+    
 
     const sendmessage = () => {
 
@@ -41,9 +41,14 @@ const Bid = () => {
         });
     };
 
+    
+
     useEffect(() => {
+        socket.emit('join_room', room);
+
         socket.on('received_message', (data) => {
 
+            console.log("received msg - ",data);
             setMax((prevMax) => {
                 const newMax = Math.max(prevMax, data.message);
                 return newMax;
@@ -52,6 +57,12 @@ const Bid = () => {
             //     return data.username
             // });
             setMaxBidder(data.username)
+        })
+        socket.on(room, (data) => {
+            console.log("startAuctionSignal - ",data);
+            alert("auction starts within few")
+            setRoomName(data);
+            setAuctionSignal(true);
         })
     }, [socket])
 
@@ -84,10 +95,11 @@ const Bid = () => {
                 setMessage(e.target.value)
             }} /> */}
 
+            {auctionSignal ? <h1>{roomName}</h1> : null}
             <button onClick={sendmessage}>Raise</button><br />
-            <h1>{username}</h1>
-            <h1>Current Bid = RS: {max}</h1>
-            <h1>Max Bidder : {maxBidder}</h1>
+            <h4>{username}</h4>
+            <h4>Current Bid = RS: {max}</h4>
+            <h4>Max Bidder : {maxBidder}</h4>
         </>
     )
 }

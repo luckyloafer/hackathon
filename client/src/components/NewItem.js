@@ -9,7 +9,8 @@ import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import { CircularProgress } from "@mui/material";
 import Alert from 'react-bootstrap/Alert';
-
+import io from 'socket.io-client'
+const socket = io.connect('http://localhost:3001')
 
 const NewItem = () => {
     const navigate = useNavigate();
@@ -37,6 +38,9 @@ const NewItem = () => {
     const initialArray = Array(data.length).fill(false);
     const [otpresponse, setOtpresponse] = useState(initialArray);
     const [loading, setLoading] = useState(initialArray);
+    const [startAuctionResponse, setStartAuctionResponse] = useState(initialArray);
+    const [selectedCardIndex, setSelectedCardIndex] = useState(-1);
+
 
     const handleItemImage = (e) => {
         setItemImage(e.target.files[0]);
@@ -181,9 +185,18 @@ const NewItem = () => {
         }
     }
 
+    const startAuction = (id, i)=>{
+        // const newAuctionStartResponse = [...startAuctionResponse];
+        // newAuctionStartResponse[selectedCardIndex]=true;
+        // setStartAuctionResponse(newAuctionStartResponse);
+         console.log("startAuction - ", id);
+          socket.emit('auctionStarted',id);
+    }
+
     useEffect(() => {
         console.log("newItem page rendered")
         getUserItems(userId);
+        
     }, [])
 
 
@@ -287,6 +300,10 @@ const NewItem = () => {
                                         }
                                     </Card.Text>
                                     {/* <button onClick={()=>{dltItem(img._id)}}>Delete Item</button> */}
+                                    
+                                    <Button variant='warning' onClick={()=>{startAuction(img.imgpath,i)}}>Start Auction</Button><br/>
+                                    {startAuctionResponse[i] ? <h4>started</h4>:null}
+
                                     {!otpresponse[i] ?
                                         <div>
 

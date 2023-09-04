@@ -32,8 +32,9 @@ const Home = () => {
 
 
   const handleClick = async (url) => {
-    await setRoom(url + "kkkkkkkkkkkkkkkkkk");
-    console.log(room);
+    // + "kkkkkkkkkkkkkkkkkk"
+    await setRoom(url );
+    //console.log(room);
     navigate('/bid');
 
   }
@@ -134,7 +135,7 @@ const Home = () => {
                     {
                       token ?
                         <>
-                          <Button variant='dark' onClick={() => handleClick(img.imgpath)}>Explore</Button>
+                                                    <Button variant='dark' onClick={() => handleClick(img.imgpath)}>Explore</Button>
                           {/* <NavLink  to='/bid'  ><Button variant='dark' >BID</Button></NavLink><br /> */}
                         </>
                         : <><NavLink to='/login' ><Button variant='dark'>Explore</Button></NavLink><br /></>

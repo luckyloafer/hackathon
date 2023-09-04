@@ -31,11 +31,11 @@ const Home = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
 
-  const handleClick = async(url) => {
+  const handleClick = async (url) => {
     await setRoom(url + "kkkkkkkkkkkkkkkkkk");
     console.log(room);
     navigate('/bid');
-    
+
   }
 
 
@@ -56,6 +56,7 @@ const Home = () => {
     else {
       //console.log(res.data.getItem)
       setData(res.data.getItem);
+      
 
     }
   }
@@ -73,8 +74,8 @@ const Home = () => {
       <Navbar bg="dark" data-bs-theme="dark" style={{ height: '60px' }}>
         <Container>
 
-          <input placeholder="Search for a movie" value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} />
-          {searchTerm.length===0 ? <button>search</button>:<button onClick={() => getItemsData(searchTerm)}>search</button>}
+          <input placeholder="Filter By State" value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} />
+          {searchTerm.length === 0 ? <button>search</button> : <button onClick={() => getItemsData(searchTerm)}>search</button>}
           <button onClick={() => getItemsData('all')}>Reset</button>
           <NavLink to="/" className="text-decoration-none text-light mx-2">Home</NavLink>
           <Nav className="me-auto">
@@ -82,7 +83,7 @@ const Home = () => {
               (
                 <>
                   <h4 style={{ color: 'white' }}>Hi {username}</h4>
-                  <NavLink to="/newItem" className="text-decoration-none text-light mx-2">NewItem</NavLink>
+                  <NavLink to="/newItem" className="text-decoration-none text-light mx-2">Dashboard</NavLink>
                   <NavLink to="/logout" className="text-decoration-none text-light mx-2">Logout</NavLink>
                 </>
 
@@ -119,21 +120,24 @@ const Home = () => {
                 }
               </> */}
               <>
-                {img.sold==="no" ?<Card style={{ width: '18rem' }}>
-                  <Card.Img variant="top" src={`http://localhost:3001/uploads/${img.imgpath}`} style={{ width: '200px', height: '200px' }}  />
+                {img.sold === "no" ? <Card style={{ width: '18rem' }}>
+                  <Card.Img variant="top" src={`http://localhost:3001/uploads/${img.imgpath}`} style={{ width: '200px', height: '200px' }} />
                   <Card.Body>
                     <Card.Title>{img.itemName}</Card.Title>
                     <Card.Text>
-                      Base Price : {img.price}$
+                      <>
+                        <span style={{fontSize:"20px"}}>Base Price : </span><span>{img.price}$</span><br/>
+                        <span>State : {img.state}</span>
+                      </>
 
                     </Card.Text>
                     {
                       token ?
                         <>
-                          <Button variant='dark' onClick={() => handleClick(img.imgpath)}>BID</Button>
+                          <Button variant='dark' onClick={() => handleClick(img.imgpath)}>Explore</Button>
                           {/* <NavLink  to='/bid'  ><Button variant='dark' >BID</Button></NavLink><br /> */}
                         </>
-                        : <><NavLink to='/login' ><Button variant='dark'>BID</Button></NavLink><br /></>
+                        : <><NavLink to='/login' ><Button variant='dark'>Explore</Button></NavLink><br /></>
 
                     }
                   </Card.Body>

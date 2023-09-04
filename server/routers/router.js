@@ -225,6 +225,8 @@ router.post("/success", async (req, res) => {
   });
 })
 
+//newItem adding
+
 router.post("/newItem", upload.single("photo"),async(req,res)=>{
   const { filename } = req.file;
   console.log(filename);
@@ -240,7 +242,8 @@ router.post("/newItem", upload.single("photo"),async(req,res)=>{
       city: city,
       imgpath: filename,
       date: date,
-      sold:"no"
+      sold:"no",
+      soldPrice:0
     });
 
     const finaldata =  await itemData.save();
@@ -289,6 +292,19 @@ router.post("/dltOtprequest", async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
+//edit base price of user items
+
+router.put('/editBasePrice/:id/:newPrice', async (req,res)=>{
+  try {
+    const {id,newPrice} = req.params;
+    const editPrice = await items.findByIdAndUpdate(id, {price:newPrice});
+    res.status(201).json({status:201,editPrice});
+    
+  } catch (error) {
+    res.status(401).json({status:401,error})
+  }
+})
 
 
 module.exports = router;

@@ -29,9 +29,14 @@ const NewItem = () => {
     const [state, setState] = useState("");
     const [city, setCity] = useState("");
     const [otp, setOtp] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [otpresponse, setOtpresponse] = useState(false);
+    //const [loading, setLoading] = useState(false);
+    //const [otpresponse, setOtpresponse] = useState(false);
     const [show, setShow] = useState(false);
+    const [editBasePrices, setEditBasePrices] = useState(data.map(()=>0));
+
+    const initialArray = Array(data.length).fill(false);
+    const [otpresponse, setOtpresponse] = useState(initialArray);
+    const [loading, setLoading] = useState(initialArray);
 
     const handleItemImage = (e) => {
         setItemImage(e.target.files[0]);
@@ -50,6 +55,11 @@ const NewItem = () => {
     }
     const handleOtpChange = (e) => {
         setOtp(e.target.value);
+    }
+    const handleEditBasePrice = (e,i) => {
+        const updatedEditBasePrices = [...editBasePrices]
+        updatedEditBasePrices[i] = e.target.value;
+        setEditBasePrices(updatedEditBasePrices);
     }
 
     const handleSubmit = async (e) => {
@@ -99,13 +109,16 @@ const NewItem = () => {
         else {
             console.log(res.data.getItem)
             setData(res.data.getItem);
+            console.log(data.length)
 
         }
     }
 
-    const handleOtp = async (e) => {
-        e.preventDefault();
-        setLoading(true);
+    const handleOtp = async (i) => {
+        //e.preventDefault();
+        const newLoading = [...loading];
+        newLoading[i] = !newLoading[i];
+        setLoading(newLoading);
         try {
 
             const response = await axios.post("http://localhost:3001/dltOtprequest", {
@@ -114,14 +127,18 @@ const NewItem = () => {
             if (response.status === 201) {
                 console.log(response.data.message.envelope);
                 alert("OTP for deletion sent to your email: " + response.data.message.envelope.to[0])
-                setOtpresponse(true);
+                const newResponses = [...otpresponse];
+                newResponses[i] = !newResponses[i];
+                setOtpresponse(newResponses);
             }
             else {
                 console.log(response);
                 alert("Someone already has that email.Try another?");
                 //setEmail("");
             }
-            setLoading(false);
+            const newLoading = [...loading];
+            newLoading[i] = !newLoading[i];
+            setLoading(newLoading);
 
         } catch (error) {
             console.log("error during Otp", error);
@@ -145,7 +162,27 @@ const NewItem = () => {
         }
     }
 
+    const changeBasePrice = async (id,i) => {
+
+        const res = await axios.put(`http://localhost:3001/editBasePrice/${id}/${editBasePrices[i]}`, {
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+        if (res.data.status === 401 || !res.data) {
+            console.log("error");
+        }
+        else {
+            console.log("price updated");
+            //setData(prevData=>prevData);
+            getUserItems(userId);
+
+            //setEditBasePrices[i]=0;
+        }
+    }
+
     useEffect(() => {
+        console.log("newItem page rendered")
         getUserItems(userId);
     }, [])
 
@@ -160,7 +197,7 @@ const NewItem = () => {
                             (
                                 <>
                                     <h4 style={{ color: 'white' }}>Hi {username}</h4>
-                                    <NavLink to="/newItem" className="text-decoration-none text-light mx-2">NewItem</NavLink>
+                                    <NavLink to="/newItem" className="text-decoration-none text-light mx-2">Dashboard</NavLink>
                                     <NavLink to="/logout" className="text-decoration-none text-light mx-2">Logout</NavLink>
                                 </>
 
@@ -233,52 +270,58 @@ const NewItem = () => {
             {
                 data.length > 0 ? data.map((img, i) => {
                     return (
-                        <>
+                        <div key={i}>
+
                             {/* <Image src={`http://localhost:3001/uploads/${img.imgpath}`} alt={img.name} width='225px' height='225px' thumbnail /> */}
                             <Card style={{ width: '18rem' }}>
                                 <Card.Img variant="top" src={`http://localhost:3001/uploads/${img.imgpath}`} style={{ width: '200px', height: '200px' }} />
                                 <Card.Body>
                                     <Card.Title>{img.itemName}</Card.Title>
                                     <Card.Text>
-                                        Base Price : {img.price}$
+                                        <>Base Price : {img.price}$</><br />
 
+                                        {img.sold === "yes" ? <span>Sold Price: {img.soldPrice}</span> :
+                                        
+                                        <><input type='number' value={editBasePrices[i]} onChange={(e)=>handleEditBasePrice(e,i)} placeholder='Edit price' style={{ width: "100px" }} />
+                                        <Button variant='primary' onClick={()=>changeBasePrice(img._id,i)}>Edit Price</Button><br /></>
+                                        }
                                     </Card.Text>
                                     {/* <button onClick={()=>{dltItem(img._id)}}>Delete Item</button> */}
-                                    {!otpresponse ?
+                                    {!otpresponse[i] ?
                                         <div>
 
-                                            {loading ? (<CircularProgress color="success" />) :
-                                               <> {
-                                                    img.sold === "no" ? <Button variant="dark" onClick={handleOtp} >
+                                            {loading[i] ? (<CircularProgress color="success" />) :
+                                                <> {
+                                                    img.sold === "no" ? <Button variant="dark" onClick={() => handleOtp(i)} >
                                                         OTP-Deletion
                                                     </Button> : <Button variant="danger">
                                                         SOLD
                                                     </Button>}
-                                                    </>
-                                            }     
-                                                {/* < Button variant="dark" onClick={handleOtp} >
+                                                </>
+                                            }
+                                            {/* < Button variant="dark" onClick={handleOtp} >
                                             OTP-Deletion
                                         </Button>} */}
-                                </div> : (<div>
-                                    <label>OTP:</label>
-                                    <input
-                                        type="text"
-                                        value={otp}
-                                        onChange={handleOtpChange}
-                                        required
-                                        name='otp'
-                                    />
-                                    <div >
-                                        <button onClick={() => { dltItem(img._id) }}>
-                                            Delete
-                                        </button>
-                                    </div>
-                                </div>)}
-                            </Card.Body>
-                        </Card >
+                                        </div> : (<div>
+                                            <label>OTP:</label>
+                                            <input
+                                                type="text"
+                                                value={otp}
+                                                onChange={handleOtpChange}
+                                                required
+                                                name='otp'
+                                            />
+                                            <div >
+                                                <button onClick={() => { dltItem(img._id) }}>
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        </div>)}
+                                </Card.Body>
+                            </Card >
 
-                        </>)
-}) : ""
+                        </div>)
+                }) : ""
             }
         </>
     )

@@ -31,6 +31,10 @@ const itemsSchema = new mongoose.Schema({
     sold:{
         type:String,
         required:true
+    },
+    soldPrice:{
+        type:Number,
+        required:true
     }
 });
 

@@ -20,7 +20,7 @@ const Bid = () => {
     }
     const [message, setMessage] = useState(0);
     const [max, setMax] = useState(0);
-
+    const [maxBidder, setMaxBidder] = useState("");
 
     console.log(room);
     socket.emit('join_room', room);
@@ -32,7 +32,7 @@ const Bid = () => {
             return prev + max + 10;
         })
         socket.emit('send_message', {
-            message, room
+            message, room, username
         })
 
         setMax((prevMax) => {
@@ -48,6 +48,10 @@ const Bid = () => {
                 const newMax = Math.max(prevMax, data.message);
                 return newMax;
             });
+            // setMaxBidder((prevBidder)=>{
+            //     return data.username
+            // });
+            setMaxBidder(data.username)
         })
     }, [socket])
 
@@ -81,7 +85,9 @@ const Bid = () => {
             }} /> */}
 
             <button onClick={sendmessage}>Raise</button><br />
+            <h1>{username}</h1>
             <h1>Current Bid = RS: {max}</h1>
+            <h1>Max Bidder : {maxBidder}</h1>
         </>
     )
 }

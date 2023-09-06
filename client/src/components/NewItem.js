@@ -40,7 +40,8 @@ const NewItem = () => {
     const [loading, setLoading] = useState(initialArray);
     const [startAuctionResponse, setStartAuctionResponse] = useState(initialArray);
     const [selectedCardIndex, setSelectedCardIndex] = useState(-1);
-
+    const [auctionStarted, setAuctionStarted] = useState([]);
+    //const [startAuctionResponse, setStartAuctionResponse] = useState(initialArray);
 
     const handleItemImage = (e) => {
         setItemImage(e.target.files[0]);
@@ -185,12 +186,17 @@ const NewItem = () => {
         }
     }
 
-    const startAuction = (id, i)=>{
-        // const newAuctionStartResponse = [...startAuctionResponse];
-        // newAuctionStartResponse[selectedCardIndex]=true;
-        // setStartAuctionResponse(newAuctionStartResponse);
-         console.log("startAuction - ", id);
-          socket.emit('auctionStarted',id);
+    const startAuction = async (id, i)=>{
+        
+        if(!auctionStarted.includes(i)){
+            console.log("startAuction - ", id);
+             socket.emit('auctionStarted',id);
+            const updatedAuctionStarted = [...auctionStarted,i];
+            setAuctionStarted(updatedAuctionStarted);
+            //setStartAuctionResponse[i]=true;
+
+        }
+         
     }
 
     useEffect(() => {

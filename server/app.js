@@ -33,14 +33,14 @@ io.on("connection", (socket) => {
     })
 
     socket.on('send_message', (data) => {
-        console.log( "send_message - ",data.room)
+        console.log( "send_message received in server - ",data.room)
         socket.to(data.room).emit('received_message', data);
     })
 
     socket.on('auctionStarted',(data)=>{
-        console.log("auctionStarted - ",data);
+        console.log("auctionStarted received in server- ",data);
         const to = data;
-        socket.to(data).emit(to,data);
+        socket.to(data).emit(data,data);
     })
     socket.on('disconnecting', () => {
         const rooms = Object.keys(socket.rooms);

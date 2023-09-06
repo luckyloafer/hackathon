@@ -21,13 +21,24 @@ const Bid = () => {
     const [message, setMessage] = useState(0);
     const [max, setMax] = useState(0);
     const [maxBidder, setMaxBidder] = useState("");
-    const [auctionSignal,setAuctionSignal] = useState(false);
-    const [roomName,setRoomName] = useState("");
+    const [auctionSignal, setAuctionSignal] = useState(false);
+    const [roomName, setRoomName] = useState("");
+    const [countdown, setCountdown] = useState(20);
+    const [timerRunning, setTimerRunning] = useState(false);
+    const [CloseSignal, setCloseSignal] = useState(false);
     //console.log(room);
-    
+
+    const startTimer = () => {
+        setCountdown(20); 
+        setTimerRunning(true);
+      };
+
+      const stopTimer = () => {
+        setTimerRunning(false);
+      };
 
     const sendmessage = () => {
-
+        setCountdown(20);
         setMessage((prev) => {
             return prev + max + 10;
         })
@@ -41,33 +52,61 @@ const Bid = () => {
         });
     };
 
-    
+
 
     useEffect(() => {
+        console.log("big rendered")
         socket.emit('join_room', room);
 
-        socket.on('received_message', (data) => {
-
-            console.log("received msg - ",data);
-            setMax((prevMax) => {
-                const newMax = Math.max(prevMax, data.message);
-                return newMax;
-            });
-            // setMaxBidder((prevBidder)=>{
-            //     return data.username
-            // });
-            setMaxBidder(data.username)
-        })
+        
         socket.on(room, (data) => {
-            console.log("startAuctionSignal - ",data);
-            alert("auction starts within few")
+            console.log("startAuctionSignal - ", data);
+            //alert("auction starts within few")
             setRoomName(data);
             setAuctionSignal(true);
+            startTimer();
+
+            socket.on('received_message', (data) => {
+
+                console.log("received msg - ", data);
+                setMax((prevMax) => {
+                    const newMax = Math.max(prevMax, data.message);
+                    return newMax;
+                });
+                // setMaxBidder((prevBidder)=>{
+                //     return data.username
+                // });
+                setMaxBidder(data.username)
+                startTimer();
+            })
         })
-    }, [socket])
+        //socket.off('startAuctionSignal');
+        
+    }, [roomName])
 
 
-
+    useEffect(() => {
+        let intervalId;
+    
+        if (timerRunning) {
+          intervalId = setInterval(() => {
+            setCountdown((prevCountdown) => prevCountdown - 1);
+          }, 1000);
+        } else {
+          clearInterval(intervalId);
+        }
+    
+        if (countdown === 0) {
+          window.alert('Countdown reached zero!');
+          setTimerRunning(false);
+          socket.off('received_message');
+          socket.off('send_message');
+          setAuctionSignal(false);
+          setCloseSignal(true);
+        }
+    
+        return () => clearInterval(intervalId);
+      }, [countdown, timerRunning]);
 
 
     return (
@@ -95,11 +134,12 @@ const Bid = () => {
                 setMessage(e.target.value)
             }} /> */}
 
-            {auctionSignal ? <h1>{roomName}</h1> : null}
-            <button onClick={sendmessage}>Raise</button><br />
+            {auctionSignal ? <><h1>Start Bidding </h1><br/><button onClick={sendmessage}>Raise</button><br /></> : null}
+            {CloseSignal?<h1>Auction Closed</h1>:null}
             <h4>{username}</h4>
             <h4>Current Bid = RS: {max}</h4>
             <h4>Max Bidder : {maxBidder}</h4>
+            <h4>Countdown Timer: {countdown} seconds</h4>
         </>
     )
 }

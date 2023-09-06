@@ -26,7 +26,7 @@ const Home = () => {
     var username = decodedToken.name;
   }
 
-  [room, setRoom] = useState("https://tse1.mm.bing.net/th?id=OIP.j14GSop07qOYX6Q9h04LhwHaF6&pid=Api&P=0&h=180");
+  [room, setRoom] = useState("");
   const [data, setData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -73,8 +73,8 @@ const Home = () => {
     <div>
 
       <Navbar bg="dark" data-bs-theme="dark" style={{ height: '60px' }}>
+      
         <Container>
-
           <input placeholder="Filter By State" value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} />
           {searchTerm.length === 0 ? <button>search</button> : <button onClick={() => getItemsData(searchTerm)}>search</button>}
           <button onClick={() => getItemsData('all')}>Reset</button>

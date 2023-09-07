@@ -1,4 +1,5 @@
 import React from 'react'
+import './App.css'
 import {Routes,Route} from 'react-router-dom'
 import Home from './components/Home';
 import Bid from './components/Bid';
@@ -7,6 +8,7 @@ import NewItem from './components/NewItem';
 import Login from './components/Login';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Logout from './components/Logout';
+import Bookmarks from './components/Bookmarks';
 const App = () => {
 
   return (
@@ -19,6 +21,7 @@ const App = () => {
         <Route path='/login' element={<Login/>}/>
         <Route path='/logout' element={<Logout/>}/>
         <Route path='/newItem' element={<NewItem/>}/>
+        <Route path="/bookmarks" element={<Bookmarks/>}/>
       </Routes>
       
     </>

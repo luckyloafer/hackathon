@@ -97,7 +97,7 @@ router.post("/login",async (req,res)=>{
  try{ 
   const userfound = await users.findOne({email,password});
   if(userfound){ 
-    const token = jwt.sign({ userId: userfound._id,name:userfound.fullName,email:userfound.email}, secret);
+    const token = jwt.sign({ userId: userfound._id,name:userfound.fullName,email:userfound.email,phNumber:userfound.phNumber}, secret);
    return res.status(201).json({ message: 'User login successfully' ,token});
 }
 return res.status(201).json({ message: 'User Not found' });
@@ -243,7 +243,8 @@ router.post("/newItem", upload.single("photo"),async(req,res)=>{
       imgpath: filename,
       date: date,
       sold:"no",
-      soldPrice:0
+      soldPrice:0,
+      auctionStatus:"false"
     });
 
     const finaldata =  await itemData.save();
@@ -299,6 +300,7 @@ router.put('/editBasePrice/:id/:newPrice', async (req,res)=>{
   try {
     const {id,newPrice} = req.params;
     const editPrice = await items.findByIdAndUpdate(id, {price:newPrice});
+    //const editAuctionStatus = await items.findByIdAndUpdate(id, {auctionStatus:"true"})
     res.status(201).json({status:201,editPrice});
     
   } catch (error) {
@@ -306,5 +308,79 @@ router.put('/editBasePrice/:id/:newPrice', async (req,res)=>{
   }
 })
 
+router.put('/auctionStatus/:id/:status', async (req,res)=>{
+  try {
+    
+    const {id,status} = req.params;
+    console.log("auctionStatus")
+    const editAuctionStatus = await items.findByIdAndUpdate(id, {auctionStatus:status});
+    console.log(typeof(status))
+    res.status(201).json({status:201, editAuctionStatus});
+    
+  } catch (error) {
+    res.status(401).json({status:401,error});
+  }
+})
+
+router.put('/soldStatus/:id/:status', async (req,res)=>{
+  await items.findByIdAndUpdate(req.params.id, {sold:"yes"});
+})
+
+router.post('/bookmark/:userId/:itemId', async(req,res)=>{
+  const {userId,itemId} = req.params;
+  const {item,phNumber} = req.body;
+  console.log("server",item)
+  console.log("server",phNumber)
+  const user = await users.findOne({_id:userId});
+  //const newBookmark = new Bookmark({ itemId });
+  //const index = user.bookmarks.indexOf(item);
+  const isItemInBookmarks = user.bookmarks.some((bookmark) => bookmark._id === item._id);
+
+    if (!isItemInBookmarks) {
+      user.bookmarks.push(item);
+      await user.save();
+    }
+  const toItem =await items.findOne({_id:itemId});
+
+  const isPhNumberInBookmarks = toItem.bookmarkedUsersPhNumber.some((phNumberinData)=>phNumberinData===phNumber);
+
+  if(!isPhNumberInBookmarks){
+    toItem.bookmarkedUsersPhNumber.push(phNumber);
+    await toItem.save();
+  }
+      
+})
+
+router.delete('/unbookmark/:userId/:itemId', async(req,res)=>{
+  const {userId, itemId} = req.params;
+  try {
+   const data =  await users.findOneAndUpdate(
+      { _id:userId},
+      {$pull:{bookmarks:{_id:itemId}}},
+      {new:true}
+     )
+     res.status(201).json({status:201,data})
+  } catch (error) {
+    res.status(401).json({status:401,error})
+  }
+  
+  })
+
+router.get('/getBookMarkData/:userId', async(req,res)=>{
+
+  const {userId}= req.params;
+  
+  try {
+    
+    const data = await users.findOne({_id:userId});
+    const bookmarks = data.bookmarks;
+    console.log(bookmarks);
+    res.status(201).json({status:201,bookmarks});
+
+} catch (error) {
+  res.status(401).json({ status: 401, error })
+}
+    
+})
 
 module.exports = router;

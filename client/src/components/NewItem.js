@@ -11,6 +11,7 @@ import { CircularProgress } from "@mui/material";
 import Alert from 'react-bootstrap/Alert';
 import io from 'socket.io-client'
 const socket = io.connect('http://localhost:3001')
+ //let roomcount =io.sockets.adapter.rooms.get()
 
 const NewItem = () => {
     const navigate = useNavigate();
@@ -42,6 +43,7 @@ const NewItem = () => {
     const [selectedCardIndex, setSelectedCardIndex] = useState(-1);
     const [auctionStarted, setAuctionStarted] = useState([]);
     //const [startAuctionResponse, setStartAuctionResponse] = useState(initialArray);
+
 
     const handleItemImage = (e) => {
         setItemImage(e.target.files[0]);
@@ -186,13 +188,22 @@ const NewItem = () => {
         }
     }
 
-    const startAuction = async (id, i)=>{
+    const startAuction = async (id, i,itemId)=>{
         
         if(!auctionStarted.includes(i)){
+            
             console.log("startAuction - ", id);
+            await axios.put(`http://localhost:3001/auctionStatus/${itemId}/true`,{
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+            await socket.emit('auctionUpdate',itemId);
              socket.emit('auctionStarted',id);
+           
             const updatedAuctionStarted = [...auctionStarted,i];
             setAuctionStarted(updatedAuctionStarted);
+            
             //setStartAuctionResponse[i]=true;
 
         }
@@ -202,6 +213,7 @@ const NewItem = () => {
     useEffect(() => {
         console.log("newItem page rendered")
         getUserItems(userId);
+
         
     }, [])
 
@@ -210,13 +222,15 @@ const NewItem = () => {
         <>
             <Navbar bg="dark" data-bs-theme="dark" style={{ height: '60px' }}>
                 <Container>
+                    {token ? <h4 style={{ color: 'white' }}>Hi {username}</h4>:null}
                     <NavLink to="/" className="text-decoration-none text-light mx-2">Home</NavLink>
                     <Nav className="me-auto">
                         {token ?
                             (
                                 <>
-                                    <h4 style={{ color: 'white' }}>Hi {username}</h4>
+                                    
                                     <NavLink to="/newItem" className="text-decoration-none text-light mx-2">Dashboard </NavLink>
+                                    <NavLink to="/bookmarks" className="text-decoration-none text-light mx-2">Bookmarks</NavLink>
                                     <NavLink to="/logout" className="text-decoration-none text-light mx-2">Logout</NavLink>
                                 </>
 
@@ -297,8 +311,9 @@ const NewItem = () => {
                                 <Card.Body>
                                     <Card.Title>{img.itemName}</Card.Title>
                                     <Card.Text>
+                                    
                                         <>Base Price : {img.price}$</><br />
-
+                                        
                                         {img.sold === "yes" ? <span>Sold Price: {img.soldPrice}</span> :
                                         
                                         <><input type='number' value={editBasePrices[i]} onChange={(e)=>handleEditBasePrice(e,i)} placeholder='Edit price' style={{ width: "100px" }} />
@@ -306,8 +321,8 @@ const NewItem = () => {
                                         }
                                     </Card.Text>
                                     {/* <button onClick={()=>{dltItem(img._id)}}>Delete Item</button> */}
-                                    
-                                    <Button variant='warning' onClick={()=>{startAuction(img.imgpath,i)}}>Start Auction</Button><br/>
+                                    {img.sold==="no"? <><Button variant='warning' onClick={()=>{startAuction(img.imgpath,i,img._id)}}>Start Auction</Button><br/></> :null}
+                                   
                                     {startAuctionResponse[i] ? <h4>started</h4>:null}
 
                                     {!otpresponse[i] ?

@@ -35,6 +35,14 @@ const itemsSchema = new mongoose.Schema({
     soldPrice:{
         type:Number,
         required:true
+    },
+    auctionStatus:{
+        type:String,
+        required:true
+    },
+    bookmarkedUsersPhNumber:{
+        type:[Number],
+        default:[]
     }
 });
 

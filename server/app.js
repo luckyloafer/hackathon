@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const app = express();
 require('./db/conn');
-const router  = require('./routers/router');
+const router = require('./routers/router');
 const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
@@ -23,24 +23,31 @@ const io = new Server(server, {
 
 
 
-io.on("connection", (socket) => {
+io.on("connection", async (socket) => {
     //console.log(socket.id);
 
     socket.on('join_room', (data) => {
         console.log("join_room - ", data)
         socket.join(data);
-        
+
+        //console.log(roomMemCount.length)
     })
 
+
     socket.on('send_message', (data) => {
-        console.log( "send_message received in server - ",data.room)
+        console.log("send_message received in server - ", data.room)
         socket.to(data.room).emit('received_message', data);
     })
 
-    socket.on('auctionStarted',(data)=>{
-        console.log("auctionStarted received in server- ",data);
+    socket.on('auctionStarted', (data) => {
+        console.log("auctionStarted received in server- ", data);
+        //axios.put(`http://localhost:3001/${}`)
         const to = data;
-        socket.to(data).emit(data,data);
+        socket.to(data).emit(data, data);
+    })
+    socket.on('auctionUpdate',(itemId)=>{
+        //io.emit('setReloadHomePage');
+        //socket.to('auctionUpdate',itemId)
     })
     socket.on('disconnecting', () => {
         const rooms = Object.keys(socket.rooms);

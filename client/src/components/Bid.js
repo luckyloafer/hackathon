@@ -1,17 +1,21 @@
 import React from 'react'
 import { useEffect, useState } from 'react'
 import { room, setRoom } from './Home'
+import { roomId } from './Home';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import io from 'socket.io-client'
-import { NavLink } from 'react-router-dom';
+import { NavLink,useNavigate } from 'react-router-dom';
 import jwt_decode from "jwt-decode";
-const socket = io.connect('http://localhost:3001')
+import axios from 'axios';
+const socket = io.connect('http://localhost:3001');
+
 
 
 const Bid = () => {
-
+    
+    const navigate = useNavigate();
     const token = !!localStorage.getItem("token");
     if (token) {
         const Token = localStorage.getItem("token");
@@ -27,6 +31,7 @@ const Bid = () => {
     const [timerRunning, setTimerRunning] = useState(false);
     const [CloseSignal, setCloseSignal] = useState(false);
     //console.log(room);
+    //console.log(roomId)
 
     const startTimer = () => {
         setCountdown(20); 
@@ -51,6 +56,16 @@ const Bid = () => {
             return newMax;
         });
     };
+
+    const setSoldStatus = async()=>{
+        const res = await axios.put(`http://localhost:3001/soldStatus/${roomId}/yes`,{
+            headers: {
+                "Content-Type": "application/json"
+            }
+         });
+         
+         
+    }
 
 
 
@@ -97,12 +112,17 @@ const Bid = () => {
         }
     
         if (countdown === 0) {
-          window.alert('Countdown reached zero!');
+          window.alert("Auction was ended");
           setTimerRunning(false);
           socket.off('received_message');
           socket.off('send_message');
           setAuctionSignal(false);
           setCloseSignal(true);
+          //axios.put(`http://localhost:3001/soldStatus/&{room}/`)
+          setSoldStatus();
+         
+            navigate('/');
+         
         }
     
         return () => clearInterval(intervalId);

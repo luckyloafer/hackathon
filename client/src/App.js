@@ -1,5 +1,5 @@
 import React from 'react'
-import './App.css'
+import './components/App.css'
 import {Routes,Route} from 'react-router-dom'
 import Home from './components/Home';
 import Bid from './components/Bid';
@@ -16,7 +16,7 @@ const App = () => {
     
     <Routes>
         <Route path='/' element={<Home/>} />
-        <Route path='/bid' element={<Bid/>} />
+        <Route path='/bid/:itemId' element={<Bid/>} />
         <Route path='/register' element={<RegisterUser/>} />
         <Route path='/login' element={<Login/>}/>
         <Route path='/logout' element={<Logout/>}/>

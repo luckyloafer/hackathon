@@ -11,9 +11,10 @@ import BookmarksRoundedIcon from '@mui/icons-material/BookmarksRounded';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import Card from 'react-bootstrap/Card';
+import Alert from 'react-bootstrap/Alert';
+
 
 const socket = io.connect('http://localhost:3001')
-
 
 //import { NavLink } from 'react-router-dom';
 let room = "";
@@ -33,7 +34,7 @@ const Home = () => {
     var username = decodedToken.name;
     var userId = decodedToken.userId;
     var phNumber =decodedToken.phNumber  ;
-    console.log(phNumber);
+   // console.log(phNumber);
   }
 
   [room, setRoom] = useState("");
@@ -56,13 +57,9 @@ const Home = () => {
     await setRoom(url );
     await setRoomId(id);
     //console.log(room);
-    navigate('/bid');
+    navigate(`/bid/${id}`);
 
   }
-
-
-
-
 
   const getItemsData = async (state) => {
 
@@ -102,10 +99,17 @@ const Home = () => {
     // })
 
   }
+
   
+  socket.on('newItemStatus',()=>{
+    alert('newItem Added in auction');
+    
+    setReload((prev)=>prev+1);
+  })
 
   useEffect(() => {
     console.log('rendered')
+    
     getItemsData('all');
     
    // console.log(Timer.isStarted());
@@ -148,11 +152,15 @@ const Home = () => {
           </Nav>
         </Container>
       </Navbar>
+      {/* //justify-content-between */}
+      <div className='row d-flex  align-items-center mt-5' style={{backgroundColor:'black'}}>
 
+     
       {
 
         data.length > 0 ? data.map((img, i) => {
         console.log(typeof(img))
+        //console.log(img.winner.soldPrice)
           return (
             <>
 
@@ -181,6 +189,7 @@ const Home = () => {
                       <>
                         <span style={{fontSize:"20px"}}>Base Price : </span><span>{img.price}$</span><br/>
                         <span>State : {img.state}</span>
+                        {img.sold==="yes" ? <h1>Sold Price: {img.winner.soldPrice}</h1>:null}
                       </>
 
                     </Card.Text>
@@ -204,6 +213,8 @@ const Home = () => {
           )
         }) : ""
       }
+      
+      </div>
     </div>
   )
 }

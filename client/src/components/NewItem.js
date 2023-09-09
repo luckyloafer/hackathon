@@ -89,6 +89,7 @@ const NewItem = () => {
             if (response.status === 201) {
                 try {
                     alert('Items posted successfully');
+                    socket.emit('newItemStatus');
                     navigate('/');
                 } catch (error) {
                     console.log('error posting item', error);

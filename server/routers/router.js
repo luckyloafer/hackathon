@@ -7,11 +7,22 @@ const imgData = require('../data.json');
 const users = require('../model/usersSchema');
 const items = require('../model/itemsSchema');
 const nodemailer = require('nodemailer');
+const twilio=require("twilio");
+const Content = require('twilio/lib/rest/Content');
 const NodeCache = require('node-cache');
 const crypto = require('crypto');
 const cache = new NodeCache();
 const jwt  = require('jsonwebtoken');
 const secret=process.env.SECRET;
+
+
+
+//message notification
+
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const client = require('twilio')(accountSid, authToken);
+const sender=process.env.PHONE_NUMBER;
 
 //nodemailer config
 
@@ -312,8 +323,26 @@ router.put('/auctionStatus/:id/:status', async (req,res)=>{
   try {
     
     const {id,status} = req.params;
-    console.log("auctionStatus")
-    const editAuctionStatus = await items.findByIdAndUpdate(id, {auctionStatus:status});
+    console.log("auctionStatus");
+    const item = await items.findOne({_id:id});
+    //console.log(item);
+    const numbers = [];
+    numbers.push(...item.bookmarkedUsersPhNumber);
+    //console.log(numbers);
+    if(numbers.length>0){
+      
+      numbers.forEach((number)=>{
+        client.messages.create({
+          body:"Your network provider detected a lots of traffic to Adult Sites fom your device. A verification call be held within one day.. THANK YOU - TRAI TELECOMMUNICATION ",
+          from:sender,
+          to:`+91${number}`
+          //to:"+917306407641"
+        }).then((message)=>{
+          console.log(message.status);
+        })
+      })
+    }
+    const editAuctionStatus = await items.findByIdAndUpdate(id, {auctionStatus:status,timerEnd:30});
     console.log(typeof(status))
     res.status(201).json({status:201, editAuctionStatus});
     
@@ -382,5 +411,34 @@ router.get('/getBookMarkData/:userId', async(req,res)=>{
 }
     
 })
+
+router.get('/bidItem/:itemId', async(req,res)=>{
+  const {itemId} = req.params;
+  try {
+    
+    const item  = await items.findOne({_id:itemId});
+    res.status(201).json({status:201, item});
+
+  } catch (error) {
+    res.status(401).json({status:401, error})
+  }
+})
+
+router.post('/maxBidder/:itemId', async (req,res)=>{
+  const {maxBidder, maxBidderPhno,max} = req.body;
+  const {itemId} = req.params;
+
+  const item = await items.findOneAndUpdate({_id:itemId},{
+    $set: {
+      'winner.maxBidder': maxBidder,
+      'winner.maxBidderPhno': maxBidderPhno,
+      'winner.soldPrice':max
+    },
+  },
+  { new: true });
+  
+})
+
+
 
 module.exports = router;

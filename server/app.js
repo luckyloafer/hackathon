@@ -49,6 +49,12 @@ io.on("connection", async (socket) => {
         //io.emit('setReloadHomePage');
         //socket.to('auctionUpdate',itemId)
     })
+
+    socket.on('newItemStatus',()=>{
+        console.log("newItemStatus")
+        //io.emit('newItemStatus');
+        socket.broadcast.emit('newItemStatus');
+    })
     socket.on('disconnecting', () => {
         const rooms = Object.keys(socket.rooms);
         rooms.forEach((room) => {

@@ -8,9 +8,20 @@ import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 
+// let BookmarkRoom = "";
+// let setBookmarkRoom ="";
+let roomId=  "";
+let setRoomId = "";
+let BookmarkRoom = "";
+let setBookmarkRoom = ""
+
 const Bookmarks = () => {
 
+  const navigate = useNavigate();
+
   const [data, setData] = useState([]);
+   [BookmarkRoom, setBookmarkRoom] = useState("");
+  [roomId, setRoomId] = useState("");
   // const initialArray = Array(data.length).fill(true);
   // const [bookmarkStatus, setbookmarkStatus] = useState(initialArray);
   const [reload,setReload] = useState(0);
@@ -58,6 +69,16 @@ const Bookmarks = () => {
     //getBookMarkData();
   }
 
+  const handleExplore = async(url,id)=>{
+    console.log(id)
+    console.log(url)
+     await setBookmarkRoom(url);
+    // await BookmarkRoom = url
+    await setRoomId(id);
+    console.log(BookmarkRoom)
+    navigate(`/bid/${id}`)
+  }
+
 
   useEffect(() => {
     console.log("bookmark rendered")
@@ -99,6 +120,8 @@ const Bookmarks = () => {
           </Nav>
         </Container>
       </Navbar>
+      <div className='row d-flex  align-items-center mt-5'>
+
       {data.length > 0 ? data.map((img, i) => {
         //console.log(img);
         return (
@@ -124,11 +147,11 @@ const Bookmarks = () => {
                     {
                       token ?
                         <>
-                          {img.sold === "no" ? <Button variant='dark' >Explore</Button> : <Button variant='danger'>SOLD</Button>}<br />
+                          {img.sold === "no" ? <Button variant='dark' onClick={()=>handleExplore(img.imgpath,img._id)}>Explore</Button> : <Button variant='danger'>SOLD</Button>}<br />
                           <Button variant='primary' onClick={() => unmark(img, i)}>Remove Bookmark</Button>
                           {/* <NavLink  to='/bid'  ><Button variant='dark' >BID</Button></NavLink><br /> */}
                         </>
-                        : <><NavLink to='/login' ><Button variant='dark'>Explore</Button></NavLink><br /></>
+                        : <><NavLink to='/login' ><Button variant='dark' >Explore</Button></NavLink><br /></>
 
                     }
                   </Card.Body>
@@ -139,8 +162,11 @@ const Bookmarks = () => {
         )
 
       }) : <h1>No bookmarks</h1>}
+      </div>
     </>
   )
 }
+
+export {BookmarkRoom,setBookmarkRoom}// Export the 'room' variable
 
 export default Bookmarks

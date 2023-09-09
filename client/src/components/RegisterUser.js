@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
 import axios from 'axios'
+import Button from '@mui/material/Button';
 import { NavLink, useNavigate } from 'react-router-dom'
 import { CircularProgress } from "@mui/material";
-import Button from 'react-bootstrap/Button';
+// import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
@@ -131,60 +132,69 @@ const RegisterUser = () => {
                     </Nav>
                 </Container>
             </Navbar>
-            <form>
-                <label>FULL NAME:</label>
+            <div className="form-container">
+            <form className="register-form">
+                <label className="col-sm-2 col-form-label">FULL NAME:</label>
                 <input
                     type='text'
                     value={fullname}
                     onChange={handleFullname}
                     name='fullname'
+                    className="register-form-label"
                 /><br />
-                <label>PH NUMBER:</label>
+                <label className="col-sm-2 col-form-label">PH NUMBER:</label>
                 <input
                     type='number'
                     value={phNumber}
                     onChange={handlePhNumber}
                     name='phNumber'
+                    className="register-form-label"
                 /><br />
-                <label>EMAIL:</label>
+                <label className="col-sm-2 col-form-label">EMAIL:</label>
                 <input
                     type='email'
                     value={email}
                     onChange={handleEmail}
                     name='email'
+                    className="register-form-label"
                 /><br />
-                <label>STATE:</label>
+                <label className="col-sm-2 col-form-label">STATE:</label>
                 <input
                     type='text'
                     value={state}
                     onChange={handleState}
                     name='state'
+                    className="register-form-label"
                 /><br />
-                <label>CITY:</label>
+                <label className="col-sm-2 col-form-label">CITY:</label>
                 <input
                     type='text'
                     value={city}
                     onChange={handleCity}
                     name='city'
+                    className="register-form-label"
                 /><br />
-                <label>PASSWORD:</label>
+                <label className="col-sm-2 col-form-label">PASSWORD:</label>
                 <input
                     type='password'
                     value={password}
                     onChange={handlePassword}
                     name='password'
+                    className="register-form-label"
                 /><br />
-                <label>CONFIRM PASSWORD:</label>
+                <label className="col-sm-2 col-form-label">CONFIRM PASSWORD:</label>
                 <input
                     type='password'
                     value={cpassword}
                     onChange={handleCpassword}
+                    className="register-form-label"
                 /><br />
-                <label>UPLOAD PROFILE:</label>
+                <label className="col-sm-2 col-form-label">UPLOAD PROFILE:</label>
                 <input
                     type='file'
                     onChange={handleProfile}
                     name='photo'
+                    className="file-input-label"
                 //value={profile}
                 /><br />
                 {!otpresponse ?
@@ -202,14 +212,16 @@ const RegisterUser = () => {
                             onChange={handleOtpChange}
                             required
                             name='otp'
+                            className='otp-container'
                         />
                         <div >
-                            <button onClick={handleSubmit}>
+                            <button onClick={handleSubmit} className='verify-otp-button' variant="contained" color="success">
                                 verify-otp
                             </button>
                         </div>
                     </div>)}
             </form>
+            </div>
         </>
     )
 }

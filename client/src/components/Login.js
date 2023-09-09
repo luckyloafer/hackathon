@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link,NavLink } from "react-router-dom";
+import Button from '@mui/material/Button';
 import axios from "axios";
 import { useNavigate } from 'react-router-dom';
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -8,7 +9,7 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
-import Button from 'react-bootstrap/Button';
+// import Button from 'react-bootstrap/Button';
 
 const Login = () => {
 
@@ -56,16 +57,49 @@ const Login = () => {
 
   return (
     <>
-      <Navbar bg="dark" data-bs-theme="dark" style={{ height: '60px' }}>
+      <Navbar bg="dark" data-bs-theme="dark" style={{ height: '60px' }} className="navbar-container">
         <Container>
-          <NavLink to="/" className="text-decoration-none text-light mx-2">Home</NavLink>
+          <NavLink to="/" className="nav-link mx-2">Home</NavLink>
           <Nav className="me-auto">
             
-            <NavLink to="/login" className="text-decoration-none text-light mx-2">Login</NavLink>
-            <NavLink to="/register" className="text-decoration-none text-light mx-2">Register</NavLink>
+            <NavLink to="/login" className="nav-link mx-2">Login</NavLink>
+            <NavLink to="/register" className="nav-link mx-2">Register</NavLink>
           </Nav>
         </Container>
       </Navbar>
+      <div className="login-body">
+        <div className="login-card">
+        <form onSubmit={handleSubmit}>
+          <label>Email:</label>
+          <input
+
+            type="email"
+            value={email}
+            onChange={handleEmailChange}
+            required
+            className="form-input"
+          /><br />
+          <label>Password:</label>
+          <input
+            type={showPassword ? "text" : "password"}
+            value={password}
+            onChange={handlePasswordChange}
+            className="form-input"
+          />
+          {
+
+            showPassword ? (
+              <VisibilityOffIcon onClick={togglePasswordVisibility} />
+            ) : (
+              <VisibilityIcon onClick={togglePasswordVisibility} />
+            )
+          }<br />
+          <Button variant="contained" color="success" type="submit"  className="form-button">Login</Button><br />
+          <span>New to Auction?</span>
+          <Link to="/register" className="form-button">Create an account</Link>
+        </form>
+        </div>
+      </div>
       <form onSubmit={handleSubmit}>
         <label>Email:</label>
         <input
@@ -74,12 +108,14 @@ const Login = () => {
           value={email}
           onChange={handleEmailChange}
           required
+          className="form-input"
         /><br />
         <label>Password:</label>
         <input
           type={showPassword ? "text" : "password"}
           value={password}
           onChange={handlePasswordChange}
+          className="form-input"
         />
         {
 
@@ -89,9 +125,9 @@ const Login = () => {
             <VisibilityIcon onClick={togglePasswordVisibility} />
           )
         }<br />
-        <Button variant="dark" type="submit">Login</Button><br />
+        <Button variant="contained" color="success" type="submit"  className="form-button">Login</Button><br />
         <span>New to Auction?</span>
-        <Link to="/register" >Create an account</Link>
+        <Link to="/register" className="form-button">Create an account</Link>
       </form>
     </>
   )

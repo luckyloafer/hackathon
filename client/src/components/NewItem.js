@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react'
+import './App.css';
+import Button from '@mui/material/Button';
 import jwt_decode from "jwt-decode";
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import { NavLink, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import Button from 'react-bootstrap/Button';
+// import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import { CircularProgress } from "@mui/material";
 import Alert from 'react-bootstrap/Alert';
@@ -224,22 +226,22 @@ const NewItem = () => {
             <Navbar bg="dark" data-bs-theme="dark" style={{ height: '60px' }}>
                 <Container>
                     {token ? <h4 style={{ color: 'white' }}>Hi {username}</h4>:null}
-                    <NavLink to="/" className="text-decoration-none text-light mx-2">Home</NavLink>
+                    <NavLink to="/" className="nav-link mx-2">Home</NavLink>
                     <Nav className="me-auto">
                         {token ?
                             (
                                 <>
                                     
-                                    <NavLink to="/newItem" className="text-decoration-none text-light mx-2">Dashboard </NavLink>
-                                    <NavLink to="/bookmarks" className="text-decoration-none text-light mx-2">Bookmarks</NavLink>
-                                    <NavLink to="/logout" className="text-decoration-none text-light mx-2">Logout</NavLink>
+                                    <NavLink to="/newItem" className="nav-link mx-2">Dashboard </NavLink>
+                                    <NavLink to="/bookmarks" className="nav-link mx-2">Bookmarks</NavLink>
+                                    <NavLink to="/logout" className="nav-link mx-2">Logout</NavLink>
                                 </>
 
                             ) : (
                                 <>
-                                    <NavLink to="/login" className="text-decoration-none text-light mx-2">Login</NavLink>
+                                    <NavLink to="/login" className="nav-link mx-2">Login</NavLink>
 
-                                    <NavLink to="/register" className="text-decoration-none text-light mx-2">SignUp</NavLink>
+                                    <NavLink to="/register" className="nav-link mx-2">SignUp</NavLink>
 
                                 </>
                             )}
@@ -256,73 +258,90 @@ const NewItem = () => {
                 </Alert> : ""
 
             }
+            <div className='row d-flex align-items-center mt-5' style={{backgroundColor:'black'}}>
+            <div>
             <form onSubmit={handleSubmit}>
-                <label>Item NAME:</label>
+            <div className="form-group row">
+                <label className="col-sm-2 col-form-label">ITEM NAME : </label>
+                <div class="col-sm-10">
                 <input
                     type='text'
                     value={itemName}
                     onChange={handleItemName}
                     name='itemName'
                     required
-                /><br />
-                <label>Base Price:</label>
+                    //className="form-input"
+                /></div><br />
+                <label className="col-sm-2 col-form-label">BASE PRICE : </label>
+                <div class="col-sm-10">
                 <input
                     type='number'
                     value={price}
                     onChange={handlePrice}
                     name='price'
                     required
-                /><br />
+                    //className="form-input"
+                /></div><br />
 
-                <label>STATE:</label>
+                <label className="col-sm-2 col-form-label">STATE:</label>
+                <div class="col-sm-10">
                 <input
                     type='text'
                     value={state}
                     onChange={handleState}
                     name='state'
                     required
-                /><br />
-                <label>CITY:</label>
+                   // className="form-input"
+                /></div><br />
+                <label className="col-sm-2 col-form-label">CITY:</label>
+                <div class="col-sm-10">
                 <input
                     type='text'
                     value={city}
                     onChange={handleCity}
                     name='city'
                     required
-                /><br />
+                    //className="form-input"
+                /></div><br />
 
-                <label>UPLOAD Item:</label>
+                <label className="col-sm-2 col-form-label">UPLOAD ITEM : </label>
+                <div class="col-sm-10">
                 <input
                     type='file'
                     onChange={handleItemImage}
                     name='photo'
                     required
+                    //className="form-input"
                 //value={profile}
-                /><br />
-                <button type='submit'>post</button>
+                /></div><br />
+                <div class="col-sm-10">
+                <Button type='submit'  variant='primary'>POST</Button>
+                </div>
+                </div>
             </form>
+            </div>
             {
                 data.length > 0 ? data.map((img, i) => {
                     return (
                         <div key={i}>
 
                             {/* <Image src={`http://localhost:3001/uploads/${img.imgpath}`} alt={img.name} width='225px' height='225px' thumbnail /> */}
-                            <Card style={{ width: '18rem' }}>
-                                <Card.Img variant="top" src={`http://localhost:3001/uploads/${img.imgpath}`} style={{ width: '200px', height: '200px' }} />
+                            <Card style={{ width: '18rem', marginRight:'30px', marginLeft:'30px' ,marginTop:'30px', marginBottom:'30px'}} classNAme='card-container'>
+                                <Card.Img variant="top" src={`http://localhost:3001/uploads/${img.imgpath}`} style={{ width: '260px', height:'200px', paddingLeft:'0px', borderLeftWidth:'40px', paddingTop:'12px' }}/>
                                 <Card.Body>
-                                    <Card.Title>{img.itemName}</Card.Title>
-                                    <Card.Text>
+                                    <Card.Title className="card-title">{img.itemName}</Card.Title>
+                                    <Card.Text className="card-text">
                                     
                                         <>Base Price : {img.price}$</><br />
                                         
                                         {img.sold === "yes" ? <span>Sold Price: {img.soldPrice}</span> :
                                         
                                         <><input type='number' value={editBasePrices[i]} onChange={(e)=>handleEditBasePrice(e,i)} placeholder='Edit price' style={{ width: "100px" }} />
-                                        <Button variant='primary' onClick={()=>changeBasePrice(img._id,i)}>Edit Price</Button><br /></>
+                                        <Button variant='primary' onClick={()=>changeBasePrice(img._id,i)} className="form-button">Edit Price</Button><br /></>
                                         }
                                     </Card.Text>
                                     {/* <button onClick={()=>{dltItem(img._id)}}>Delete Item</button> */}
-                                    {img.sold==="no"? <><Button variant='warning' onClick={()=>{startAuction(img.imgpath,i,img._id)}}>Start Auction</Button><br/></> :null}
+                                    {img.sold==="no"? <><Button variant='warning' onClick={()=>{startAuction(img.imgpath,i,img._id)}} className="form-button">Start Auction</Button><br/></> :null}
                                    
                                     {startAuctionResponse[i] ? <h4>started</h4>:null}
 
@@ -331,9 +350,9 @@ const NewItem = () => {
 
                                             {loading[i] ? (<CircularProgress color="success" />) :
                                                 <> {
-                                                    img.sold === "no" ? <Button variant="dark" onClick={() => handleOtp(i)} >
+                                                    img.sold === "no" ? <Button variant="dark" onClick={() => handleOtp(i)} className="form-button">
                                                         OTP-Deletion
-                                                    </Button> : <Button variant="danger">
+                                                    </Button> : <Button variant="danger" className="form-button">
                                                         SOLD
                                                     </Button>}
                                                 </>
@@ -349,9 +368,10 @@ const NewItem = () => {
                                                 onChange={handleOtpChange}
                                                 required
                                                 name='otp'
+                                                className="form-input"
                                             />
                                             <div >
-                                                <button onClick={() => { dltItem(img._id) }}>
+                                                <button onClick={() => { dltItem(img._id) }} className="form-button">
                                                     Delete
                                                 </button>
                                             </div>
@@ -362,6 +382,7 @@ const NewItem = () => {
                         </div>)
                 }) : ""
             }
+            </div>
         </>
     )
 }

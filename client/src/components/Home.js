@@ -1,9 +1,11 @@
 import React from 'react'
+import './App.css';
+import Button from '@mui/material/Button';
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { NavLink, useNavigate } from 'react-router-dom';
 import io from 'socket.io-client'
-import Button from 'react-bootstrap/Button';
+// import Button from 'react-bootstrap/Button';
 import jwt_decode from "jwt-decode";
 import Container from 'react-bootstrap/Container';
 import BookmarksOutlinedIcon from '@mui/icons-material/BookmarksOutlined';
@@ -117,33 +119,33 @@ const Home = () => {
 
 
   return (
-    <div>
+    <div style={{backgroundColor:'black',minheight: '100vh'}}>
      
       <Navbar bg="dark" data-bs-theme="dark" style={{ height: '60px' }}>
       
-        <Container>
+        <Container className="navbar-container">
         
         {token ? <h4 style={{ color: 'white' }}>Hi {username}</h4>:null}
-          <input placeholder="Filter By State" value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} />
-          {searchTerm.length === 0 ? <button>search</button> : <button onClick={() => getItemsData(searchTerm)}>search</button>}
-          <button onClick={() => getItemsData('all')}>Reset</button>
-          <NavLink to="/" className="text-decoration-none text-light mx-2">Home</NavLink>
+          <input placeholder="Filter By State" value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} style={{margin:'0px 5px'}}/>
+          {searchTerm.length === 0 ? <Button variant="contained" color="success" className='search-button' style={{marginRight:'3px'}}>search</Button> : <Button onClick={() => getItemsData(searchTerm)} variant="contained" color="success" className="search-button">search</Button>}
+          <Button onClick={() => getItemsData('all')} className="reset-button" variant="contained" color="error" style={{marginLeft:'3px'}}>Reset</Button>
+          <NavLink to="/" className="nav-link mx-2">Home</NavLink>
           <Nav className="me-auto">
             {token ?
               (
                 <>
                   
-                  <NavLink to="/newItem" className="text-decoration-none text-light mx-2">Dashboard</NavLink>
-                  <NavLink to="/bookmarks" className="text-decoration-none text-light mx-2">Bookmarks</NavLink>
-                  <NavLink to="/logout" className="text-decoration-none text-light mx-2">Logout</NavLink>
+                  <NavLink to="/newItem" className="nav-link mx-2">Dashboard</NavLink>
+                  <NavLink to="/bookmarks" className="nav-link mx-2">Bookmarks</NavLink>
+                  <NavLink to="/logout" className="nav-link mx-2">Logout</NavLink>
                   
                 </>
 
               ) : (
                 <>
-                  <NavLink to="/login" className="text-decoration-none text-light mx-2">Login</NavLink>
+                  <NavLink to="/login" className="nav-link mx-2">Login</NavLink>
 
-                  <NavLink to="/register" className="text-decoration-none text-light mx-2">SignUp</NavLink>
+                  <NavLink to="/register" className="nav-link mx-2">SignUp</NavLink>
 
                 </>
               )}
@@ -177,15 +179,15 @@ const Home = () => {
               </> */}
               <>
                 {img.sold === "no" || img.sold==="yes" ? <Card style={{ width: '18rem' }}>
-                  <Card.Img variant="top" src={`http://localhost:3001/uploads/${img.imgpath}`} style={{ width: '200px', height: '200px' }} />
+                  <Card.Img variant="top" src={`http://localhost:3001/uploads/${img.imgpath}`} className='card-image' />
                  {!bookmarkStatus[i] ?<BookmarksOutlinedIcon onClick= {()=>{mark(img,i); alert("Item bookmarked")}}/>:<BookmarksRoundedIcon/>} 
-                  <Card.Body>
+                  <Card.Body className='card'>
                   
-                    <Card.Title>{img.itemName}</Card.Title>
+                    <Card.Title className='card-title'>{img.itemName}</Card.Title>
                     
                   {img.sold==="no"?<>{img.auctionStatus==="true"? <h3>Auction Ongoing</h3>:<h3>Not Started yet</h3>}</>:null}  
                     
-                    <Card.Text>
+                    <Card.Text className='card-text'>
                       <>
                         <span style={{fontSize:"20px"}}>Base Price : </span><span>{img.price}$</span><br/>
                         <span>State : {img.state}</span>
@@ -196,7 +198,7 @@ const Home = () => {
                     {
                       token ?
                         <>
-                                                  {img.sold==="no" ? <Button variant='dark' onClick={() => handleClick(img.imgpath,img._id)}>Explore</Button>:<Button variant='danger'>SOLD</Button>}  
+                          {img.sold==="no" ? <Button variant='outlined' style={{ backgroundColor: 'black', color: 'white' }} onClick={() => handleClick(img.imgpath,img._id)}>Explore</Button>:<Button variant='outlined' color='secondary'>SOLD</Button>}  
                           {/* <NavLink  to='/bid'  ><Button variant='dark' >BID</Button></NavLink><br /> */}
                         </>
                         : <><NavLink to='/login' ><Button variant='dark'>Explore</Button></NavLink><br /></>
